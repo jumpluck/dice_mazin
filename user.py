@@ -100,6 +100,9 @@ def rstdat():
             ws.cell(row=row, column=c_mazk, value=default_mazk)
         else:
             break
+    ws.cell(row=1, column=5, value=csno())
+    ws.cell(row=1, column=6, value=default_csn)
+    ws.cell(row=1, column=7, value=default_maz)
     wb.save("userDB.xlsx")
     wb.close()
 

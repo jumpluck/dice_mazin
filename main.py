@@ -261,7 +261,7 @@ async def mazininfo(ctx):
             botlvl = calbotlvl() + (mazki // 2) + 1
         else:
             botlvl = calbotlvl() + (mazki // 2)
-        botlvl -= mamny//10000
+        # botlvl -= mamny//10000
         if botlvl < 0:
             botlvl = 0
         mazbed = discord.Embed(title="ユーザー名", description="ダイスの魔人", color=0xE67A3F)
@@ -293,7 +293,7 @@ async def vsbot(ctx, bat):
                 else:
                     botlvl = calbotlvl()+(kigen//2)
                 mamny = mazinkin()
-                botlvl -= mamny // 10000
+                # botlvl -= mamny // 10000
                 if botlvl < 0:
                     botlvl = 0
                 if money < int(bat):
