@@ -45,27 +45,7 @@ def readxls():
     return wb, ws
 
 
-def dataget():
-    scope = [
-    'https://spreadsheets.google.com/feeds',
-    'https://www.googleapis.com/auth/drive',
-    ]
-    json_file_name = 'dice-mazin-4b8be2be76c1.json'
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file_name, scope)
-    gc = gspread.authorize(credentials)
-    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1X-7ek4MVuDNevUjnK_AU0ZMo5FgMfwQSNlw8jOApL9E/edit#gid=0'
-    wbg = gc.open_by_url(spreadsheet_url)
-    wsg = wbg.worksheet('user')
-    range_list = wsg.range('A1:I50')
-    wb = Workbook()
-    ws = wb.active
-    for cel in range_list:
-        ws.cell(cel.row, cel.col, cel.value)
-    wb.save("userDB.xlsx")
-    wb.close()
-
-
-def datasave():
+def cnntgsr():
     scope = [
         'https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive',
@@ -76,6 +56,22 @@ def datasave():
     spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1X-7ek4MVuDNevUjnK_AU0ZMo5FgMfwQSNlw8jOApL9E/edit#gid=0'
     wbg = gc.open_by_url(spreadsheet_url)
     wsg = wbg.worksheet('user')
+    return wsg
+
+
+def dataget():
+    wsg = cnntgsr()
+    range_list = wsg.range('A1:I50')
+    wb = Workbook()
+    ws = wb.active
+    for cel in range_list:
+        ws.cell(cel.row, cel.col, cel.value)
+    wb.save("userDB.xlsx")
+    wb.close()
+
+
+def datasave():
+    wsg = cnntgsr()
     cel = []
     cels =[]
     wb, ws = readxls()

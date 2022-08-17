@@ -13,7 +13,7 @@ token = open("token.txt", "r").readline()
 bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
 
 sched = BackgroundScheduler()
-sched.add_job(datasave, 'cron', second='0', id="datsv")
+sched.add_job(datasave, 'interval', seconds=10)
 sched.start()
 
 
