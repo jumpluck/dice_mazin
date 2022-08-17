@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "dice-mazin",
+  "private_key_id": "4b8be2be76c159f58a6dc025669d1981ee7c4b44",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDWseotSV6iTZdG\nTdLcvP71WYtk9vSNCE8zTjP3gNs8yLpwmKtogEnYTQncmnpaoNAOgtgrjxSBZb7P\nQQHAgh6CZnXDQ4WMPwVvtJ1nJ3ufdkPCANqZ97RTMFEka/xXx7QYxpYzWS+EBrj3\nDmLp4qkmhXC6vdhqFySIDYucetv+sQBMuvylv3uFrcDxO4ASgkJ1NkmNqsarpO4c\nS6t9JaxaaCtj7kC+IFP8P4QNQBEwXsweI4LIvh5NVpa1D8unp4Rz57bKnFPOIPYo\nPGz1jhW0ogufkQ3tHlXVJqbJfEVybckafnM6qiz51NwlY80WWZQ+An/w/iF4dTZb\nopqnYS4hAgMBAAECggEAAuNdkrqjEeSgkXbsTGEj/mW0Gvl6AHgxRY/KoeybNmn+\nXROmsacRJz5hELVIylWRuvI+aXaZKGT3oEbf+MifU7KAaM4smp6B6pbny6qTrolb\nH73ecvYKuFhE7SwhNsaWWQN544qyeZCUFim8waf1jdG7ep2hbsrtKEHjZAlgkoBl\ne7nwQ4Y6981fEHJXtgabCye99ZC52T7L6w2UzG2uCzviaJ/TBV0cpIXXn5InZB0K\nz+ksGVAdFTaWSMTN+GaAyk2CkrxWjy/knRACzwAnvWfHj8FpQ6sR7jSIBhgPWq8b\nVjAMXOe5f2CEEi/2xM1Sg3Y3xabdcQW2MmZiPiUxIQKBgQD/JN/0J/tXx5n1DCrz\nP3ncMb1Y64pQ+ZdwgavYvrIFVjA1707e8fnRgQ5C0x4AOtOzKlUYZuUZ32n68RGN\nPgBtHpO2DAjO8AJ+aRaF0sK7GqFoXv/yf3znWfc0I0SYrfyWALsTxI7LChYPRvpA\ncoF08i7JfAIFKepdRMM7BrI9MQKBgQDXak0Uet05CgUr4Svxza2HZjKsO9ycLaMF\ngYHZWN0jbhSQgxwgqb0s0YKW4EE4Q2tAKpUZsvtGd4ehy+FIQx0JO+fpTE3RArhH\nMdhycF7nA/ujbGvJ2MDx1NARAuUK4t68nZbuX+eBs+yxu4Vm0HZt1QiaAIFmo4Eq\nbxYRQT4D8QKBgQCKQbgdvOClE2Mo93v6rgXhvQ5GtfQQpv9aFtpBLCyZWbfsMg5C\nH0tpLI7GxVH3e+klqCXOgEtbNsZeFe2V5OgkOTJ/rovDXylqyJVM1QVykB6wyPHW\nvSC42PZsyUOtnHJH8oNtVdCu03tasfJ/o8zkyytxQQJzO+BkxBMq1BkXsQKBgBAP\nVsvOFSwpeRU6ZmJSqTtM/T4mAF6McHj6nMmtfF8l19amT7SHsxjiTdAdy/7718Ui\n55bQ5zbrtmrznkoa5tFHbBTSoYKRp1d3eeGeSxUCEQKwFKEpzci5ywFZq+XR4DVD\nsnr3H3VmCqF9j4aIyCuMFGYW347dZcXaHlUO/iahAoGARrG2OIQUOyVuce8ifDtZ\ny697Ap9yjh4vmGc5ML/+2wmBAjKVdLQ9hYodEvhD6IKSXKqyR2oJwpZIfRE4+BWA\nCF9aNrUwi4adScENSHQsKLH4fieHb6LVY0wCWtiOP4uXipjV3UruubwQzoofAC8b\nmfVOKdRkH/zZEfa4F5RqICI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "dicemazin@dice-mazin.iam.gserviceaccount.com",
+  "client_id": "107270071486095138180",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dicemazin%40dice-mazin.iam.gserviceaccount.com"
+}

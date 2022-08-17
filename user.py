@@ -3,6 +3,9 @@ import os
 from openpyxl import load_workbook, Workbook
 from math import ceil
 from dice import csno
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 
 c_name = 1
 c_id = 2
@@ -20,25 +23,76 @@ default_maz = 10000
 default_mazk = 0
 default_cascnt = 0
 
-if os.path.isfile("userDB.xlsx"):
-    wb = load_workbook("userDB.xlsx")
-    ws = wb.active
 
-else:
+# if os.path.isfile("userDB.xlsx"):
+
+# else:
+#     ws.cell(row=1, column=c_name, value="name")
+#     ws.cell(row=1, column=c_id, value="id")
+#     ws.cell(row=1, column=c_money, value="money")
+#     ws.cell(row=1, column=c_lvl, value="lvl")
+#     ws.cell(row=1, column=5, value=csno())
+#     ws.cell(row=1, column=6, value=default_csn)
+#     ws.cell(row=1, column=7, value=default_maz)
+#     wb.save("userDB.xlsx")
+
+
+def readxls():
+    if not os.path.isfile("userDB.xlsx"):
+        dataget()
+    wb = load_workbook('userDB.xlsx')
+    ws = wb.active
+    return wb, ws
+
+
+def dataget():
+    scope = [
+    'https://spreadsheets.google.com/feeds',
+    'https://www.googleapis.com/auth/drive',
+    ]
+    json_file_name = 'dice-mazin-4b8be2be76c1.json'
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file_name, scope)
+    gc = gspread.authorize(credentials)
+    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1X-7ek4MVuDNevUjnK_AU0ZMo5FgMfwQSNlw8jOApL9E/edit#gid=0'
+    wbg = gc.open_by_url(spreadsheet_url)
+    wsg = wbg.worksheet('user')
+    range_list = wsg.range('A1:I50')
     wb = Workbook()
     ws = wb.active
-    ws.cell(row=1, column=c_name, value="name")
-    ws.cell(row=1, column=c_id, value="id")
-    ws.cell(row=1, column=c_money, value="money")
-    ws.cell(row=1, column=c_lvl, value="lvl")
-    ws.cell(row=1, column=5, value=csno())
-    ws.cell(row=1, column=6, value=default_csn)
-    ws.cell(row=1, column=7, value=default_maz)
+    for cel in range_list:
+        ws.cell(cel.row, cel.col, cel.value)
     wb.save("userDB.xlsx")
+    wb.close()
+
+
+def datasave():
+    scope = [
+        'https://spreadsheets.google.com/feeds',
+        'https://www.googleapis.com/auth/drive',
+    ]
+    json_file_name = 'dice-mazin-4b8be2be76c1.json'
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file_name, scope)
+    gc = gspread.authorize(credentials)
+    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1X-7ek4MVuDNevUjnK_AU0ZMo5FgMfwQSNlw8jOApL9E/edit#gid=0'
+    wbg = gc.open_by_url(spreadsheet_url)
+    wsg = wbg.worksheet('user')
+    cel = []
+    cels =[]
+    wb, ws = readxls()
+    cell_range = ws['A1:I50']
+    for idx in cell_range:
+        for idy in idx:
+            cel.append(idy.value)
+        cels.append(cel)
+        cel = []
+    wsg.update('A1:I50', cels)
+    wb.close()
+    print('save complete')
 
 
 def checkrow():
-    for row in range(2, 100):
+    wb, ws = readxls()
+    for row in range(3, 50):
         if ws.cell(row, 1).value is None:
             wb.close()
             return row
@@ -46,22 +100,24 @@ def checkrow():
 
 
 def signup(_name, _id):
+    wb, ws = readxls()
     _row = checkrow()
-    ws.cell(row=_row, column=c_name, value=_name)
-    ws.cell(row=_row, column=c_id, value=hex(_id))
-    ws.cell(row=_row, column=c_money, value=default_money)
-    ws.cell(row=_row, column=c_lvl, value=default_lvl)
-    ws.cell(row=_row, column=c_macnt, value=default_cnt)
-    ws.cell(row=_row, column=c_casnk, value=default_cascnt)
-    ws.cell(row=_row, column=c_mazk, value=default_mazk)
+    ws.cell(_row, c_name, _name)
+    ws.cell(_row, c_id, str(hex(_id)))
+    ws.cell(_row, c_money, str(default_money))
+    ws.cell(_row, c_lvl, str(default_lvl))
+    ws.cell(_row, c_macnt, str(default_cnt))
+    ws.cell(_row, c_casnk, str(default_cascnt))
+    ws.cell(_row, c_mazk, str(default_mazk))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def findid(_id):
-    for row in range(2, 100):
+    wb, ws = readxls()
+    for row in range(3, 50):
         if ws.cell(row, c_name).value is not None:
-            if ws.cell(row, c_id).value == hex(_id):
+            if ws.cell(row, c_id).value == str(hex(_id)):
                 wb.close()
                 return row
         else:
@@ -71,114 +127,130 @@ def findid(_id):
 
 
 def edtlvl(_row, _lvl):
+    wb, ws = readxls()
     if ws.cell(_row, c_name).value is not None:
-        ws.cell(row=_row, column=c_lvl, value=_lvl)
+        ws.cell(_row, c_lvl, str(_lvl))
         wb.save("userDB.xlsx")
         wb.close()
 
 
 def edtmny(_row, _money):
+    wb, ws = readxls()
     if ws.cell(_row, c_name).value is not None:
-        ws.cell(row=_row, column=c_money, value=_money)
+        ws.cell(_row, c_money, str(_money))
         wb.save("userDB.xlsx")
         wb.close()
 
 
 def rdinf(_row):
+    wb, ws = readxls()
     if ws.cell(_row, c_name).value is not None:
-        return ws.cell(_row, c_money).value, ws.cell(_row, c_lvl).value, ws.cell(_row, c_macnt).value, \
-               ws.cell(_row, c_casnk).value
+        return int(ws.cell(_row, c_money).value), int(ws.cell(_row, c_lvl).value), int(ws.cell(_row, c_macnt).value), \
+               int(ws.cell(_row, c_casnk).value)
 
 
 def rstdat():
-    for row in range(2, 100):
+    wb, ws = readxls()
+    for row in range(3, 50):
         if ws.cell(row, 1).value is not None:
-            ws.cell(row=row, column=c_money, value=default_money)
-            ws.cell(row=row, column=c_lvl, value=default_lvl)
-            ws.cell(row=row, column=c_macnt, value=default_cnt)
-            ws.cell(row=row, column=c_casnk, value=default_cascnt)
-            ws.cell(row=row, column=c_mazk, value=default_mazk)
+            ws.cell(row, c_money, str(default_money))
+            ws.cell(row, c_lvl, str(default_lvl))
+            ws.cell(row, c_macnt, str(default_cnt))
+            ws.cell(row, c_casnk, str(default_cascnt))
+            ws.cell(row, c_mazk, str(default_mazk))
         else:
             break
-    ws.cell(row=1, column=5, value=csno())
-    ws.cell(row=1, column=6, value=default_csn)
-    ws.cell(row=1, column=7, value=default_maz)
+    ws.cell(1, 2, str(csno()))
+    ws.cell(1, 4, str(default_csn))
+    ws.cell(1, 6, str(default_maz))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def calbotlvl():
+    wb, ws = readxls()
     _row = checkrow()
     botlvl = 0
-    if _row > 2:
-        for row in range(2, _row):
-            botlvl += ws.cell(row, c_lvl).value
+    if _row > 3:
+        for row in range(3, _row):
+            botlvl += int(ws.cell(row, c_lvl).value)
         return ceil(botlvl/(_row-2))
 
 
 def csnonum():
-    return ws.cell(1, 5).value
+    wb, ws = readxls()
+    return int(ws.cell(1, 2).value)
 
 
 def csnokin():
-    return ws.cell(1, 6).value
+    wb, ws = readxls()
+    return int(ws.cell(1, 4).value)
 
 
 def csnokined(mny):
-    ws.cell(row=1, column=6, value=mny)
+    wb, ws = readxls()
+    ws.cell(1, 4, str(mny))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def csnorst():
-    ws.cell(row=1, column=5, value=csno())
+    wb, ws = readxls()
+    ws.cell(1, 2, str(csno()))
     csnokined(10000)
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def mazinkin():
-    return ws.cell(1, 7).value
+    wb, ws = readxls()
+    return int(ws.cell(1, 6).value)
 
 
 def mazinkined(mny):
-    ws.cell(row=1, column=7, value=mny)
+    wb, ws = readxls()
+    ws.cell(1, 6, str(mny))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def macnted(row, cnt):
-    ws.cell(row=row, column=c_macnt, value=cnt)
+    wb, ws = readxls()
+    ws.cell(row, c_macnt, str(cnt))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def mazinki(row):
-    return ws.cell(row, c_mazk).value
+    wb, ws = readxls()
+    return int(ws.cell(row, c_mazk).value)
 
 
 def mazinkied(_row, kig):
-    ws.cell(row=_row, column=c_mazk, value=kig)
+    wb, ws = readxls()
+    ws.cell(_row, c_mazk, str(kig))
     wb.save("userDB.xlsx")
     wb.close()
 
 
 def cascnt(row):
-    cscnt = ws.cell(row, c_casnk).value
-    ws.cell(row=row, column=c_casnk, value=cscnt+1)
+    wb, ws = readxls()
+    cscnt = int(ws.cell(row, c_casnk).value)
+    ws.cell(row, c_casnk, str(cscnt+1))
     wb.save("userDB.xlsx")
     wb.close()
-    return cscnt
+    return int(cscnt)
 
 
 def rank():
+    wb, ws = readxls()
     userrank = {}
     usernum = checkrow()
-    for row in range(2, usernum):
+    for row in range(3, usernum):
         if ws.cell(row, c_id).value != "0x9e8818f3342007b":
-            uslvl = ws.cell(row, c_lvl).value
+            uslvl = int(ws.cell(row, c_lvl).value)
             usname = ws.cell(row, c_name).value
-            usmny = ws.cell(row, c_money).value
+            usmny = int(ws.cell(row, c_money).value)
             userrank[usname] = uslvl, usmny
     result = sorted(userrank.items(), reverse=True, key=lambda item: item[1])
     return result

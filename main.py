@@ -1,19 +1,43 @@
 # import asyncio
 import discord
+# import time
+from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
-    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank
+    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave
 from dice import enchnt, csno, vsbt, batdice, dihyaku
 from discord.ext import commands
 from math import ceil
+
 token = open("token.txt", "r").readline()
 
-
 bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
+
+sched = BackgroundScheduler()
+sched.add_job(datasave, 'cron', second='0', id="datsv")
+sched.start()
 
 
 @bot.event
 async def on_ready():
     print("We have logged in as {0.user}".format(bot))
+
+
+@bot.command()
+async def dg(ctx):
+    if hex(ctx.author.id) == "0x9e8818f3342007b":
+        dataget()
+        await ctx.send("データ読み込み完了")
+    else:
+        await ctx.send("権限がありません")
+
+
+@bot.command()
+async def ds(ctx):
+    if hex(ctx.author.id) == "0x9e8818f3342007b":
+        datasave()
+        await ctx.send("データバックアップ完了")
+    else:
+        await ctx.send("権限がありません")
 
 
 @bot.command(aliases=['a', '登録'])
@@ -68,10 +92,10 @@ async def info(ctx):
     if row is not None:
         money, level, cnt, ccnt = rdinf(row)
         infbed = discord.Embed(title="ユーザー名", description=ctx.author.name, color=0xE67A3F)
-        infbed.add_field(name="所持金", value=str(money)+"円", inline=False)
-        infbed.add_field(name="ダイス強化レベル", value="＋"+str(level), inline=False)
+        infbed.add_field(name="所持金", value=f"{money}円", inline=False)
+        infbed.add_field(name="ダイス強化レベル", value=f"＋{level}", inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
-        infbed.set_footer(text="ダイスの出目が＋"+str(level**2)+"されます。")
+        infbed.set_footer(text=f"ダイスの出目が{level**2}されます。")
         await ctx.send(embed=infbed)
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
@@ -181,9 +205,9 @@ async def specialenchant(ctx):
                 mamny = mazinkin()
                 faild = dihyaku()
                 reslt = enchnt(level)
-                if faild == 100 and (reslt != 1):
-                    edtlvl(row, level - 5)
-                    await ctx.send("ファンブル！！、{}のダイスがうんちに落ちました。\nダイスの強化段階が＋{}まで下がりました。"
+                if faild == 100 and (reslt == 3):
+                    edtlvl(row, level - 3)
+                    await ctx.send("ファンブル！！、{}のダイスが粉々に砕けそうだったけど土下座して何とか免れました！\nダイスの強化段階が＋{}まで下がりました。"
                                    "\n所持金が{}円残りました。".format(ctx.author.mention, str(level - 5), str(money-daikin)))
                 else:
                     if reslt == 1:
