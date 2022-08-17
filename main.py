@@ -207,7 +207,7 @@ async def specialenchant(ctx):
                 reslt = enchnt(level)
                 if faild == 100 and (reslt == 3):
                     edtlvl(row, level - 3)
-                    await ctx.send("ファンブル！！、{}のダイスが粉々に砕けそうだったけど土下座して何とか免れました！\nダイスの強化段階が＋{}まで下がりました。"
+                    await ctx.send("ファンブル！！、{}は土下座しようとしたんですが間違ってダイスを踏みつぶしました。\nダイスの強化段階が＋{}まで下がりました。"
                                    "\n所持金が{}円残りました。".format(ctx.author.mention, str(level - 5), str(money-daikin)))
                 else:
                     if reslt == 1:

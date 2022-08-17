@@ -87,7 +87,7 @@ def datasave():
         cel = []
     wsg.update('A1:I50', cels)
     wb.close()
-    print('save complete')
+    # print('save complete')
 
 
 def checkrow():
