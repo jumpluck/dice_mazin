@@ -4,4 +4,3 @@ openpyxl
 gspread
 apscheduler
 oauth2client
-discord
