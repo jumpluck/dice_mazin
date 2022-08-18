@@ -1,9 +1,9 @@
 # import asyncio
-import discord
 # import time
+import discord
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
-    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave
+    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, getname
 from dice import enchnt, csno, vsbt, batdice, dihyaku
 from discord.ext import commands
 from math import ceil
@@ -95,6 +95,18 @@ async def info(ctx):
         infbed.add_field(name="所持金", value=f"{money}円", inline=False)
         infbed.add_field(name="ダイス強化レベル", value=f"＋{level}", inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
+        infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
+        seme, uke = battler(row)
+        if (seme is not None) and (uke is not None):
+            s_name = getname(seme)
+            u_name = getname(uke)
+            infbed.add_field(name="果たし状", value=f"{s_name}に出して、{u_name}から貰ってます。", inline=False)
+        elif seme is not None:
+            s_name = getname(seme)
+            infbed.add_field(name="果たし状", value=f"{s_name}に出してます。", inline=False)
+        elif uke is not None:
+            u_name = getname(uke)
+            infbed.add_field(name="果たし状", value=f"{u_name}から貰ってます。", inline=False)
         infbed.set_footer(text=f"ダイスの出目が{level**2}されます。")
         await ctx.send(embed=infbed)
     else:
@@ -110,6 +122,17 @@ async def infoother(ctx, user: discord.User):
         infbed.add_field(name="保有資金", value=str(money) + "円", inline=False)
         infbed.add_field(name="ダイス強化レベル", value="＋" + str(level), inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
+        seme, uke = battler(row)
+        if (seme is not None) and (uke is not None):
+            s_name = getname(seme)
+            u_name = getname(uke)
+            infbed.add_field(name="果たし状", value=f"{s_name}に出して、{u_name}から貰ってます。", inline=False)
+        elif seme is not None:
+            s_name = getname(seme)
+            infbed.add_field(name="果たし状", value=f"{s_name}に出してます。", inline=False)
+        elif uke is not None:
+            u_name = getname(uke)
+            infbed.add_field(name="果たし状", value=f"{u_name}から貰ってます。", inline=False)
         infbed.set_footer(text="ダイスの出目が＋" + str(level ** 2) + "されます。")
         await ctx.send(embed=infbed)
     else:
@@ -154,31 +177,34 @@ async def enchantper(ctx):
 async def enchant(ctx):
     row = findid(ctx.author.id)
     if row is not None:
-        money, level, cnt, ccnt = rdinf(row)
-        if money < 100:
-            await ctx.send("金欠なのでガチャガチャできません、100円集めて来なさい")
-        else:
-            macnted(row, 3)
-            edtmny(row, money-100)
-            mamny = mazinkin()
-            mazinkined(mamny + 100)
-            reslt = enchnt(level)
-            if reslt == 1:
-                edtlvl(row, level+1)
-                await ctx.send("強化成功！！、{}のダイスが＋{}に強化されました！\n所持金が{}円残りました。".format(ctx.author.mention,
-                                                                                  str(level+1), str(money-100)))
-            elif reslt == 2:
-                edtlvl(row, level-1)
-                await ctx.send("強化失敗！、{}のダイスの強化段階が＋{}に下がりました！\n所持金が{}円残りました。".format(ctx.author.mention,
-                                                                                     str(level-1), str(money-100)))
-            elif reslt == 3:
-                edtlvl(row, 0)
-                await ctx.send("強化失敗！！、{}のダイスが粉々に砕けました！\n所持金が{}円残りました。".format(ctx.author.mention,
-                                                                               str(money-100)))
+        seme, uke = battler(row)
+        if (seme is None) and (uke is None):
+            money, level, cnt, ccnt = rdinf(row)
+            if money < 100:
+                await ctx.send("金欠なのでガチャガチャできません、100円集めて来なさい")
             else:
-                await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。".format(ctx.author.mention,
-                                                                            str(money-100)))
-
+                macnted(row, 3)
+                edtmny(row, money-100)
+                mamny = mazinkin()
+                mazinkined(mamny + 100)
+                reslt = enchnt(level)
+                if reslt == 1:
+                    edtlvl(row, level+1)
+                    await ctx.send("強化成功！！、{}のダイスが＋{}に強化されました！\n所持金が{}円残りました。".format(ctx.author.mention,
+                                                                                      str(level+1), str(money-100)))
+                elif reslt == 2:
+                    edtlvl(row, level-1)
+                    await ctx.send("強化失敗！、{}のダイスの強化段階が＋{}に下がりました！\n所持金が{}円残りました。".format(ctx.author.mention,
+                                                                                         str(level-1), str(money-100)))
+                elif reslt == 3:
+                    edtlvl(row, 0)
+                    await ctx.send("強化失敗！！、{}のダイスが粉々に砕けました！\n所持金が{}円残りました。".format(ctx.author.mention,
+                                                                                   str(money-100)))
+                else:
+                    await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。".format(ctx.author.mention,
+                                                                                str(money-100)))
+        else:
+            await ctx.send("果たし状を処理するまでは強化できません。")
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
@@ -188,44 +214,48 @@ async def specialenchant(ctx):
     row = findid(ctx.author.id)
     if row is not None:
         money, level, cnt, ccnt = rdinf(row)
-        if level < 6:
-            await ctx.send("スペシャル強化は＋6以上からしましょう、勿体ないです。")
-        else:
-            if level < 18:
-                daikin = level * 500
-                if daikin == 0:
-                    daikin = 500
+        seme, uke = battler(row)
+        if (seme is None) and (uke is None):
+            if level < 6:
+                await ctx.send("スペシャル強化は＋6以上からしましょう、勿体ないです。")
             else:
-                daikin = level * 1000
-            if money < daikin:
-                await ctx.send("スペシャル強化には{}円必要です。".format(daikin))
-            else:
-                macnted(row, 3)
-                edtmny(row, money-daikin)
-                mamny = mazinkin()
-                faild = dihyaku()
-                reslt = enchnt(level)
-                if faild == 100 and (reslt == 3):
-                    edtlvl(row, level - 3)
-                    await ctx.send("ファンブル！！、{}は土下座しようとしたんですが間違ってダイスを踏みつぶしました。\nダイスの強化段階が＋{}まで下がりました。"
-                                   "\n所持金が{}円残りました。".format(ctx.author.mention, str(level - 5), str(money-daikin)))
+                if level < 18:
+                    daikin = level * 500
+                    if daikin == 0:
+                        daikin = 500
                 else:
-                    if reslt == 1:
-                        edtlvl(row, level+1)
-                        await ctx.send("強化成功！！、{}のダイスが＋{}に強化されました！\n所持金が{}円残りました。"
-                                       .format(ctx.author.mention, str(level+1), str(money-daikin)))
-                    elif reslt == 2:
-                        mazinkined(mamny + daikin // 2)
-                        await ctx.send("強化失敗！、{}のダイスの強化段階が＋{}に下がりそうだったけど媚びを売って何とか防げました！"
-                                       "\n所持金が{}円残りました。".format(ctx.author.mention, str(level-1), str(money-daikin)))
-                    elif reslt == 3:
-                        mazinkined(mamny + daikin // 2)
-                        await ctx.send("強化失敗！！、{}のダイスが粉々に砕けそうだったけど土下座して何とか免れました！"
-                                       "\n所持金が{}円残りました。".format(ctx.author.mention, str(money-daikin)))
+                    daikin = level * 1000
+                if money < daikin:
+                    await ctx.send("スペシャル強化には{}円必要です。".format(daikin))
+                else:
+                    macnted(row, 3)
+                    edtmny(row, money-daikin)
+                    mamny = mazinkin()
+                    faild = dihyaku()
+                    reslt = enchnt(level)
+                    if faild == 100 and (reslt == 3):
+                        edtlvl(row, level - 3)
+                        await ctx.send("ファンブル！！、{}は土下座しようとしたんですが間違ってダイスを踏みつぶしました。\nダイスの強化段階が＋{}まで下がりました。"
+                                       "\n所持金が{}円残りました。".format(ctx.author.mention, str(level - 5), str(money-daikin)))
                     else:
-                        mazinkined(mamny + daikin)
-                        await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。"
-                                       .format(ctx.author.mention, str(money-daikin)))
+                        if reslt == 1:
+                            edtlvl(row, level+1)
+                            await ctx.send("強化成功！！、{}のダイスが＋{}に強化されました！\n所持金が{}円残りました。"
+                                           .format(ctx.author.mention, str(level+1), str(money-daikin)))
+                        elif reslt == 2:
+                            mazinkined(mamny + daikin // 2)
+                            await ctx.send("強化失敗！、{}のダイスの強化段階が＋{}に下がりそうだったけど媚びを売って何とか防げました！"
+                                           "\n所持金が{}円残りました。".format(ctx.author.mention, str(level-1), str(money-daikin)))
+                        elif reslt == 3:
+                            mazinkined(mamny + daikin // 2)
+                            await ctx.send("強化失敗！！、{}のダイスが粉々に砕けそうだったけど土下座して何とか免れました！"
+                                           "\n所持金が{}円残りました。".format(ctx.author.mention, str(money-daikin)))
+                        else:
+                            mazinkined(mamny + daikin)
+                            await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。"
+                                           .format(ctx.author.mention, str(money-daikin)))
+        else:
+            await ctx.send("果たし状を処理するまでは強化できません。")
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
@@ -235,40 +265,44 @@ async def enchantren(ctx, num):
     if int(num) <= 25:
         row = findid(ctx.author.id)
         if row is not None:
-            kyobed = discord.Embed(title="{}連強化".format(num), description="強化スタート！", color=0x000000)
-            money, level, cnt, ccnt = rdinf(row)
-            if money < 100*int(num):
-                await ctx.send("そんなに回せるお金ないやんか！")
-            else:
-                macnted(row, 3)
-                for i in range(1, int(num)+1):
-                    money, level, cnt, ccnt = rdinf(row)
-                    edtmny(row, money - 100)
-                    mamny = mazinkin()
-                    mazinkined(mamny+100)
-                    reslt = enchnt(level)
-                    if reslt == 1:
-                        edtlvl(row, level + 1)
-                        kyobed.add_field(name="{}回目".format(str(i)), value="強化成功！！、{}のダイスが＋{}に強化されました！"
-                                                                           "\n所持金が{}円残りました。"
-                                         .format(ctx.author.name, str(level + 1), str(money - 100)), inline=False)
-                    elif reslt == 2:
-                        edtlvl(row, level - 1)
-                        kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗！、{}のダイスの強化段階が＋{}に下がりました！"
-                                                                           "\n所持金が{}円残りました。"
-                                         .format(ctx.author.name, str(level - 1), str(money - 100)), inline=False)
-                    elif reslt == 3:
-                        edtlvl(row, 0)
-                        kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗！！、{}のダイスが粉々に砕けました！"
-                                                                           "\n所持金が{}円残りました。"
-                                         .format(ctx.author.name, str(money - 100)), inline=False)
-                    else:
-                        kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗、{}は何も得られませんでした。"
-                                                                           "\n所持金が{}円残りました。"
-                                         .format(ctx.author.name, str(money - 100)), inline=False)
-                await ctx.send(embed=kyobed)
+            seme, uke = battler(row)
+            if (seme is None) and (uke is None):
+                kyobed = discord.Embed(title="{}連強化".format(num), description="強化スタート！", color=0x000000)
                 money, level, cnt, ccnt = rdinf(row)
-                await ctx.send("{}のダイスは＋{}になった！".format(ctx.author.mention, str(level)))
+                if money < 100*int(num):
+                    await ctx.send("そんなに回せるお金ないやんか！")
+                else:
+                    macnted(row, 3)
+                    for i in range(1, int(num)+1):
+                        money, level, cnt, ccnt = rdinf(row)
+                        edtmny(row, money - 100)
+                        mamny = mazinkin()
+                        mazinkined(mamny+100)
+                        reslt = enchnt(level)
+                        if reslt == 1:
+                            edtlvl(row, level + 1)
+                            kyobed.add_field(name="{}回目".format(str(i)), value="強化成功！！、{}のダイスが＋{}に強化されました！"
+                                                                               "\n所持金が{}円残りました。"
+                                             .format(ctx.author.name, str(level + 1), str(money - 100)), inline=False)
+                        elif reslt == 2:
+                            edtlvl(row, level - 1)
+                            kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗！、{}のダイスの強化段階が＋{}に下がりました！"
+                                                                               "\n所持金が{}円残りました。"
+                                             .format(ctx.author.name, str(level - 1), str(money - 100)), inline=False)
+                        elif reslt == 3:
+                            edtlvl(row, 0)
+                            kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗！！、{}のダイスが粉々に砕けました！"
+                                                                               "\n所持金が{}円残りました。"
+                                             .format(ctx.author.name, str(money - 100)), inline=False)
+                        else:
+                            kyobed.add_field(name="{}回目".format(str(i)), value="強化失敗、{}は何も得られませんでした。"
+                                                                               "\n所持金が{}円残りました。"
+                                             .format(ctx.author.name, str(money - 100)), inline=False)
+                    await ctx.send(embed=kyobed)
+                    money, level, cnt, ccnt = rdinf(row)
+                    await ctx.send("{}のダイスは＋{}になった！".format(ctx.author.mention, str(level)))
+            else:
+                await ctx.send("果たし状を処理するまでは強化できません。")
         else:
             await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
     else:
@@ -386,19 +420,22 @@ async def vsbot(ctx, bat):
 
 @bot.command(aliases=['d', 'ダイス当て'])
 async def diceate(ctx, ans, bat):
-    if int(ans) == 1 or int(ans) == 2:
+    if 1 <= int(ans) <= 100:
         row = findid(ctx.author.id)
         if row is not None:
             money, level, cnt, ccnt = rdinf(row)
             if money >= int(bat):
                 da = dihyaku()
-                if (da % 2 == 0 and int(ans) == 2) or (da % 2 == 1 and int(ans) == 1):
+                if da == int(ans):
+                    edtmny(row, money + (int(bat) * 2))
+                    diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！\n掛け金 : {bat}円", color=0xC49C48)
+                elif (da % 2 == 0 and int(ans) == 2) or (da % 2 == 1 and int(ans) == 1):
                     edtmny(row, money + int(bat))
-                    diabed = discord.Embed(title="勝　利", description="100面ダイスの出目が奇数か、偶数か当てよう！"
+                    diabed = discord.Embed(title="勝　利", description="100面ダイスの出目を当てよう！"
                                                                     "\n掛け金 : {}円".format(bat), color=0x06508D)
                 else:
                     edtmny(row, money - int(bat))
-                    diabed = discord.Embed(title="敗　北", description="100面ダイスの出目が奇数か、偶数か当てよう！"
+                    diabed = discord.Embed(title="敗　北", description="100面ダイスの出目を当てよう！"
                                                                     "\n掛け金 : {}円".format(bat), color=0xD71143)
                     mamny = mazinkin()
                     mazinkined(mamny + int(bat)//2)
@@ -407,9 +444,9 @@ async def diceate(ctx, ans, bat):
                 else:
                     diabed.add_field(name="ダイスの出目", value="{}  奇数".format(da))
                 if int(ans) == 1:
-                    diabed.add_field(name="{}の予想".format(ctx.author.name), value="奇数")
+                    diabed.add_field(name="{}の予想".format(ctx.author.name), value=f"{ans}  奇数")
                 else:
-                    diabed.add_field(name="{}の予想".format(ctx.author.name), value="偶数")
+                    diabed.add_field(name="{}の予想".format(ctx.author.name), value=f"{ans}  偶数")
                 money2, level, cnt, ccnt = rdinf(row)
                 diabed.add_field(name="あなたの所持金", value="{}円 -> {}円".format(money, money2), inline=False)
                 cscnt = cascnt(row)
@@ -586,4 +623,70 @@ async def ranking(ctx):
     await ctx.send(embed=ranbed)
 
 
+@bot.command(aliases=['h', '果たし状'])
+async def hatasijou(ctx, user: discord.User):
+    row = findid(ctx.author.id)
+    row2 = findid(user.id)
+    if (row is not None) and (row2 is not None):
+        deki = battlew(row, row2)
+        if deki:
+            await ctx.send(f"{ctx.author.mention}は{user.mention}に果たし状を出しました。")
+        else:
+            await ctx.send(f"既に誰かとバトルの準備をしてます。")
+    elif row is None:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(user.mention))
+
+
+@bot.command(aliases=['u', '受けて立つ'])
+async def uketetatsu(ctx, money, dicemen):
+    row = findid(ctx.author.id)
+    if row is not None:
+        seme, uke = battler(row)
+        if uke is not None:
+            u_money, u_level, cnt, ccnt = rdinf(row)
+            s_money, s_level, cnt, ccnt = rdinf(uke)
+            batmny = min(int(money), u_money, s_money)
+            u_dice = batdice(int(dicemen))
+            s_dice = batdice(int(dicemen))
+            s_name = getname(uke)
+            u_name = ctx.author.name
+            batbed = discord.Embed(title="ダイスバトル！", description=f"挑戦者 : {s_name}   保守者 : {u_name}",
+                                   color=0x542200)
+            if s_dice == 1:
+                batbed.add_field(name=f"{s_name}", value="出目:1\n確定勝利")
+            elif s_dice == int(dicemen):
+                batbed.add_field(name=f"{s_name}", value=f"出目:{s_dice}\n確定敗北")
+            else:
+                batbed.add_field(name=f"{s_name}", value=f"出目:{s_dice}＋ダイス効果:{s_level ** 2}\n合計:"
+                                                         f"{s_dice + (s_level ** 2)}")
+            if u_dice == 1:
+                batbed.add_field(name=f"{u_name}", value="出目:1\n確定勝利")
+            elif u_dice == int(dicemen):
+                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}\n確定敗北")
+            else:
+                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}＋ダイス効果:{u_level ** 2}\n合計:"
+                                                                  f"{u_dice + (u_level ** 2)}")
+            if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or \
+                ((s_dice + (s_level ** 2)) == (u_dice + (u_level ** 2))):
+                batbed.add_field(name="対戦結果", value="引き分け", inline=False)
+            elif u_dice < s_dice:
+                batbed.add_field(name="対戦結果", value=f"{s_name}の勝ち", inline=False)
+                edtmny(row, u_money-batmny)
+                edtmny(uke, s_money+batmny)
+                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money + batmny}円", inline=False)
+                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money - batmny}円", inline=False)
+            else:
+                batbed.add_field(name="対戦結果", value=f"{u_name}の勝ち", inline=False)
+                edtmny(row, u_money + batmny)
+                edtmny(uke, s_money - batmny)
+                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money - batmny}円", inline=False)
+                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money + batmny}円", inline=False)
+            battlee(uke, row)
+            await ctx.send(embed=batbed)
+        else:
+            await ctx.send("{}は誰からでも果たし状を受けてません".format(ctx.author.mention))
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 bot.run(token)

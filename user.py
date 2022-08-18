@@ -14,6 +14,8 @@ c_lvl = 4
 c_macnt = 5
 c_casnk = 6
 c_mazk = 7
+c_seme = 8
+c_uke = 9
 
 default_money = 10000
 default_lvl = 0
@@ -73,7 +75,7 @@ def dataget():
 def datasave():
     wsg = cnntgsr()
     cel = []
-    cels =[]
+    cels = []
     wb, ws = readxls()
     cell_range = ws['A1:I50']
     for idx in cell_range:
@@ -141,8 +143,12 @@ def edtmny(_row, _money):
 def rdinf(_row):
     wb, ws = readxls()
     if ws.cell(_row, c_name).value is not None:
-        return int(ws.cell(_row, c_money).value), int(ws.cell(_row, c_lvl).value), int(ws.cell(_row, c_macnt).value), \
-               int(ws.cell(_row, c_casnk).value)
+        money = int(ws.cell(_row, c_money).value)
+        level = int(ws.cell(_row, c_lvl).value)
+        macnt = int(ws.cell(_row, c_macnt).value)
+        casnk = int(ws.cell(_row, c_casnk).value)
+        wb.close()
+        return money, level, macnt, casnk
 
 
 def rstdat():
@@ -170,17 +176,22 @@ def calbotlvl():
     if _row > 3:
         for row in range(3, _row):
             botlvl += int(ws.cell(row, c_lvl).value)
+        wb.close()
         return ceil(botlvl/(_row-2))
 
 
 def csnonum():
     wb, ws = readxls()
-    return int(ws.cell(1, 2).value)
+    csnon = int(ws.cell(1, 2).value)
+    wb.close()
+    return csnon
 
 
 def csnokin():
     wb, ws = readxls()
-    return int(ws.cell(1, 4).value)
+    csnok = int(ws.cell(1, 4).value)
+    wb.close()
+    return csnok
 
 
 def csnokined(mny):
@@ -200,7 +211,9 @@ def csnorst():
 
 def mazinkin():
     wb, ws = readxls()
-    return int(ws.cell(1, 6).value)
+    mazink = int(ws.cell(1, 6).value)
+    wb.close()
+    return mazink
 
 
 def mazinkined(mny):
@@ -219,7 +232,9 @@ def macnted(row, cnt):
 
 def mazinki(row):
     wb, ws = readxls()
-    return int(ws.cell(row, c_mazk).value)
+    mazki = int(ws.cell(row, c_mazk).value)
+    wb.close()
+    return mazki
 
 
 def mazinkied(_row, kig):
@@ -249,4 +264,41 @@ def rank():
             usmny = int(ws.cell(row, c_money).value)
             userrank[usname] = uslvl, usmny
     result = sorted(userrank.items(), reverse=True, key=lambda item: item[1])
+    wb.close()
     return result
+
+
+def battlew(row, row2):
+    wb, ws = readxls()
+    if (ws.cell(row, c_seme).value in None) and (ws.cell(row2, c_uke).value in None):
+        ws.cell(row, c_seme, str(row2))
+        ws.cell(row2, c_uke, str(row))
+        wb.save("userDB.xlsx")
+        wb.close()
+        return True
+    else:
+        wb.close()
+        return False
+
+
+def battler(row):
+    wb, ws = readxls()
+    seme = int(ws.cell(row, c_seme).value)
+    uke = int(ws.cell(row, c_uke).value)
+    wb.close()
+    return seme, uke
+
+
+def battlee(row, row2):
+    wb, ws = readxls()
+    ws.cell(row, c_seme, None)
+    ws.cell(row2, c_uke, None)
+    wb.save("userDB.xlsx")
+    wb.close()
+
+
+def getname(row):
+    wb, ws = readxls()
+    usname = ws.cell(row, c_name).value
+    wb.close()
+    return usname
