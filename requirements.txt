@@ -1,5 +1,4 @@
-discord.py
-asyncio
+discord
 openpyxl
 gspread
 apscheduler

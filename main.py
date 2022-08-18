@@ -1,16 +1,18 @@
-import asyncio
-import discord
+# import asyncio
 # import time
+import discord
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
-    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, getname
+    mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
+    getname
 from dice import enchnt, csno, vsbt, batdice, dihyaku
 from discord.ext import commands
 from math import ceil
 
 token = open("token.txt", "r").readline()
-bot = discord.Client()
-bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="$", intents=intents)  # 접두사를 $로 지정
 sched = BackgroundScheduler()
 sched.add_job(datasave, 'interval', seconds=10)
 sched.start()
@@ -243,7 +245,8 @@ async def specialenchant(ctx):
                         elif reslt == 2:
                             mazinkined(mamny + daikin // 2)
                             await ctx.send("強化失敗！、{}のダイスの強化段階が＋{}に下がりそうだったけど媚びを売って何とか防げました！"
-                                           "\n所持金が{}円残りました。".format(ctx.author.mention, str(level-1), str(money-daikin)))
+                                           "\n所持金が{}円残りました。".format(ctx.author.mention,
+                                                                    str(level-1), str(money-daikin)))
                         elif reslt == 3:
                             mazinkined(mamny + daikin // 2)
                             await ctx.send("強化失敗！！、{}のダイスが粉々に砕けそうだったけど土下座して何とか免れました！"
@@ -664,10 +667,10 @@ async def uketetatsu(ctx, money, dicemen):
             elif u_dice == int(dicemen):
                 batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}\n確定敗北")
             else:
-                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}＋ダイス効果:{u_level ** 2}\n合計:"
-                                                                  f"{u_dice + (u_level ** 2)}")
-            if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or \
-                ((s_dice + (s_level ** 2)) == (u_dice + (u_level ** 2))):
+                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}＋ダイス効果:{u_level ** 2}\n"
+                                                         f"合計:{u_dice + (u_level ** 2)}")
+            if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or ((s_dice + (s_level ** 2)) ==
+                                                                                 (u_dice + (u_level ** 2))):
                 batbed.add_field(name="対戦結果", value="引き分け", inline=False)
             elif (s_dice == 1) or (u_dice == int(dicemen)) or (u_dice + (u_level ** 2)) < (s_dice + (s_level ** 2)):
                 batbed.add_field(name="対戦結果", value=f"{s_name}の勝ち", inline=False)
