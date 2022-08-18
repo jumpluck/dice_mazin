@@ -9,7 +9,7 @@ from discord.ext import commands
 from math import ceil
 
 token = open("token.txt", "r").readline()
-
+bot = discord.Client()
 bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
 sched = BackgroundScheduler()
 sched.add_job(datasave, 'interval', seconds=10)
