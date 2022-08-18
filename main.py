@@ -10,9 +10,8 @@ from discord.ext import commands
 from math import ceil
 
 token = open("token.txt", "r").readline()
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="$", intents=intents)  # 접두사를 $로 지정
+# intents = discord.Intents().all()
+bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
 sched = BackgroundScheduler()
 sched.add_job(datasave, 'interval', seconds=10)
 sched.start()
@@ -690,4 +689,6 @@ async def uketetatsu(ctx, money, dicemen):
             await ctx.send("{}は誰からでも果たし状を受けてません".format(ctx.author.mention))
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+
+
 bot.run(token)
