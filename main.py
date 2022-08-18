@@ -95,7 +95,6 @@ async def info(ctx):
         infbed.add_field(name="所持金", value=f"{money}円", inline=False)
         infbed.add_field(name="ダイス強化レベル", value=f"＋{level}", inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
-        infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
         seme, uke = battler(row)
         if (seme is not None) and (uke is not None):
             s_name = getname(seme)
@@ -671,7 +670,7 @@ async def uketetatsu(ctx, money, dicemen):
             if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or \
                 ((s_dice + (s_level ** 2)) == (u_dice + (u_level ** 2))):
                 batbed.add_field(name="対戦結果", value="引き分け", inline=False)
-            elif u_dice < s_dice:
+            elif (s_dice == 1) or (u_dice == int(dicemen)) or (u_dice + (u_level ** 2)) < (s_dice + (s_level ** 2)):
                 batbed.add_field(name="対戦結果", value=f"{s_name}の勝ち", inline=False)
                 edtmny(row, u_money-batmny)
                 edtmny(uke, s_money+batmny)

@@ -270,7 +270,7 @@ def rank():
 
 def battlew(row, row2):
     wb, ws = readxls()
-    if (ws.cell(row, c_seme).value in None) and (ws.cell(row2, c_uke).value in None):
+    if (ws.cell(row, c_seme).value is None) and (ws.cell(row2, c_uke).value is None):
         ws.cell(row, c_seme, str(row2))
         ws.cell(row2, c_uke, str(row))
         wb.save("userDB.xlsx")
@@ -283,16 +283,24 @@ def battlew(row, row2):
 
 def battler(row):
     wb, ws = readxls()
-    seme = int(ws.cell(row, c_seme).value)
-    uke = int(ws.cell(row, c_uke).value)
+    if ws.cell(row, c_seme).value is None:
+        seme = None
+    else:
+        seme = int(ws.cell(row, c_seme).value)
+    if ws.cell(row, c_uke).value is None:
+        uke = None
+    else:
+        uke = int(ws.cell(row, c_uke).value)
     wb.close()
     return seme, uke
 
 
 def battlee(row, row2):
     wb, ws = readxls()
-    ws.cell(row, c_seme, None)
-    ws.cell(row2, c_uke, None)
+    ws.cell(row, c_seme, "")
+    print(ws.cell(row, c_seme).value)
+    ws.cell(row2, c_uke, "")
+    print(ws.cell(row2, c_uke).value)
     wb.save("userDB.xlsx")
     wb.close()
 
