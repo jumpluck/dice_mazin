@@ -10,8 +10,7 @@ from discord.ext import commands
 from math import ceil
 
 token = open("token.txt", "r").readline()
-intents = discord.Intents.default()
-intents.members = True
+intents = discord.Intents().all()
 bot = commands.Bot(command_prefix="$", intents=intents)  # 접두사를 $로 지정
 sched = BackgroundScheduler()
 sched.add_job(datasave, 'interval', seconds=10)
