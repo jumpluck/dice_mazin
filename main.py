@@ -1,6 +1,6 @@
-# import asyncio
-# import time
+import asyncio
 import discord
+# import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, getname
@@ -9,9 +9,7 @@ from discord.ext import commands
 from math import ceil
 
 token = open("token.txt", "r").readline()
-
 bot = commands.Bot(command_prefix="$")  # 접두사를 $로 지정
-
 sched = BackgroundScheduler()
 sched.add_job(datasave, 'interval', seconds=10)
 sched.start()
