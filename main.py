@@ -96,14 +96,14 @@ async def info(ctx):
         infbed.add_field(name="ダイス強化レベル", value=f"＋{level}", inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
         seme, uke = battler(row)
-        if (seme is not None) and (uke is not None):
+        if (seme != 0) and (uke != 0):
             s_name = getname(seme)
             u_name = getname(uke)
             infbed.add_field(name="果たし状", value=f"{s_name}に出して、{u_name}から貰ってます。", inline=False)
-        elif seme is not None:
+        elif seme != 0:
             s_name = getname(seme)
             infbed.add_field(name="果たし状", value=f"{s_name}に出してます。", inline=False)
-        elif uke is not None:
+        elif uke != 0:
             u_name = getname(uke)
             infbed.add_field(name="果たし状", value=f"{u_name}から貰ってます。", inline=False)
         infbed.set_footer(text=f"ダイスの出目が{level**2}されます。")
@@ -122,14 +122,14 @@ async def infoother(ctx, user: discord.User):
         infbed.add_field(name="ダイス強化レベル", value="＋" + str(level), inline=False)
         infbed.add_field(name="カジノ出勤回数", value="{}回".format(ccnt), inline=False)
         seme, uke = battler(row)
-        if (seme is not None) and (uke is not None):
+        if (seme != 0) and (uke != 0):
             s_name = getname(seme)
             u_name = getname(uke)
             infbed.add_field(name="果たし状", value=f"{s_name}に出して、{u_name}から貰ってます。", inline=False)
-        elif seme is not None:
+        elif seme != 0:
             s_name = getname(seme)
             infbed.add_field(name="果たし状", value=f"{s_name}に出してます。", inline=False)
-        elif uke is not None:
+        elif uke != 0:
             u_name = getname(uke)
             infbed.add_field(name="果たし状", value=f"{u_name}から貰ってます。", inline=False)
         infbed.set_footer(text="ダイスの出目が＋" + str(level ** 2) + "されます。")
@@ -644,7 +644,7 @@ async def uketetatsu(ctx, money, dicemen):
     row = findid(ctx.author.id)
     if row is not None:
         seme, uke = battler(row)
-        if uke is not None:
+        if uke != 0:
             u_money, u_level, cnt, ccnt = rdinf(row)
             s_money, s_level, cnt, ccnt = rdinf(uke)
             batmny = min(int(money), u_money, s_money)

@@ -107,6 +107,8 @@ def signup(_name, _id):
     ws.cell(_row, c_macnt, str(default_cnt))
     ws.cell(_row, c_casnk, str(default_cascnt))
     ws.cell(_row, c_mazk, str(default_mazk))
+    ws.cell(_row, c_seme, str(0))
+    ws.cell(_row, c_uke, str(0))
     wb.save("userDB.xlsx")
     wb.close()
 
@@ -160,6 +162,8 @@ def rstdat():
             ws.cell(row, c_macnt, str(default_cnt))
             ws.cell(row, c_casnk, str(default_cascnt))
             ws.cell(row, c_mazk, str(default_mazk))
+            ws.cell(row, c_seme, str(0))
+            ws.cell(row, c_uke, str(0))
         else:
             break
     ws.cell(1, 2, str(csno()))
@@ -270,7 +274,7 @@ def rank():
 
 def battlew(row, row2):
     wb, ws = readxls()
-    if (ws.cell(row, c_seme).value is None) and (ws.cell(row2, c_uke).value is None):
+    if int(ws.cell(row, c_seme).value) == 0 and int(ws.cell(row2, c_uke).value) == 0:
         ws.cell(row, c_seme, str(row2))
         ws.cell(row2, c_uke, str(row))
         wb.save("userDB.xlsx")
@@ -283,24 +287,16 @@ def battlew(row, row2):
 
 def battler(row):
     wb, ws = readxls()
-    if ws.cell(row, c_seme).value is None:
-        seme = None
-    else:
-        seme = int(ws.cell(row, c_seme).value)
-    if ws.cell(row, c_uke).value is None:
-        uke = None
-    else:
-        uke = int(ws.cell(row, c_uke).value)
+    seme = int(ws.cell(row, c_seme).value)
+    uke = int(ws.cell(row, c_uke).value)
     wb.close()
     return seme, uke
 
 
 def battlee(row, row2):
     wb, ws = readxls()
-    ws.cell(row, c_seme, "")
-    print(ws.cell(row, c_seme).value)
-    ws.cell(row2, c_uke, "")
-    print(ws.cell(row2, c_uke).value)
+    ws.cell(row, c_seme, str(0))
+    ws.cell(row2, c_uke, str(0))
     wb.save("userDB.xlsx")
     wb.close()
 
