@@ -177,7 +177,7 @@ async def enchant(ctx):
     row = findid(ctx.author.id)
     if row is not None:
         seme, uke = battler(row)
-        if (seme is None) and (uke is None):
+        if (seme == 0) and (uke == 0):
             money, level, cnt, ccnt = rdinf(row)
             if money < 100:
                 await ctx.send("金欠なのでガチャガチャできません、100円集めて来なさい")
@@ -214,7 +214,7 @@ async def specialenchant(ctx):
     if row is not None:
         money, level, cnt, ccnt = rdinf(row)
         seme, uke = battler(row)
-        if (seme is None) and (uke is None):
+        if (seme == 0) and (uke == 0):
             if level < 6:
                 await ctx.send("スペシャル強化は＋6以上からしましょう、勿体ないです。")
             else:
@@ -266,7 +266,7 @@ async def enchantren(ctx, num):
         row = findid(ctx.author.id)
         if row is not None:
             seme, uke = battler(row)
-            if (seme is None) and (uke is None):
+            if (seme == 0) and (uke == 0):
                 kyobed = discord.Embed(title="{}連強化".format(num), description="強化スタート！", color=0x000000)
                 money, level, cnt, ccnt = rdinf(row)
                 if money < 100*int(num):
