@@ -485,6 +485,7 @@ async def casino(ctx):
             edtmny(row, money+ck)
             money2, level, cnt, ccnt = rdinf(row)
             csnorst()
+            csnokined(10000)
             cn2 = csnonum()
             casbed.add_field(name="あなたの所持金", value="{}円 -> {}円".format(money, money2), inline=False)
             casbed.add_field(name="次のJackpot Number", value="{}".format(cn2), inline=False)
