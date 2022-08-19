@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
     getname
-from dice import enchnt, csno, vsbt, batdice, dihyaku
+from dice import enchnt, csno, vsbt, batdice, dihyaku, bac
 from discord.ext import commands
 from math import ceil
 
@@ -640,7 +640,7 @@ async def hatasijou(ctx, user: discord.User):
 
 
 @bot.command(aliases=['u', '受けて立つ'])
-async def uketetatsu(ctx, money, dicemen):
+async def uketetatsu(ctx, dicemen, money):
     row = findid(ctx.author.id)
     if row is not None:
         seme, uke = battler(row)
@@ -687,6 +687,66 @@ async def uketetatsu(ctx, money, dicemen):
             await ctx.send(embed=batbed)
         else:
             await ctx.send("{}は誰からでも果たし状を受けてません".format(ctx.author.mention))
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+
+
+@bot.command(aliases=['bc', 'バカラ'])
+async def baccarat(ctx, batrslt, batting):
+    row = findid(ctx.author.id)
+    if row is not None:
+        if batrslt == 't' or batrslt == 'T' or batrslt == 'p' or batrslt == 'P' or batrslt == 'b' or batrslt == 'B':
+            if batrslt == 'T':
+                batrslt = 't'
+            if batrslt == 'P':
+                batrslt = 'p'
+            if batrslt == 'B':
+                batrslt = 'b'
+            uname = getname(row)
+            pc, bc, result, pce, bce = bac()
+            money, level, cnt, ccnt = rdinf(row)
+            batmny = min(money, int(batting))
+            await ctx.send(f"{ctx.author.mention}は'{pc[0][0]+str(pc[0][1])}'と'{pc[1][0]+str(pc[1][1])}'を引きました。")
+            await ctx.send(f"バンカーは'{bc[0][0] + str(bc[0][1])}'と'{bc[1][0] + str(bc[1][1])}'を引きました。")
+            if result == batrslt:
+                bacbed = discord.Embed(title="バカラ", description="勝ち！", color=0xB6E4FE)
+                if batrslt == 't':
+                    edtmny(row, money+(int(batmny)*8))
+                elif batrslt == 'p':
+                    edtmny(row, money + int(batmny))
+                else:
+                    edtmny(row, money + ceil(int(batmny)*0.95))
+            else:
+                bacbed = discord.Embed(title="バカラ", description="負け！", color=0xFEE1F5)
+                edtmny(row, money - int(batmny))
+            if len(pc) > 2:
+                await ctx.send(f"{ctx.author.mention}は'{pc[2][0] + str(pc[2][1])}'を引きました。")
+                bacbed.add_field(name=f"{uname}のカード", value=f"{pc[0][0]+str(pc[0][1])}\n"
+                                                            f"{pc[1][0]+str(pc[1][1])}\n{pc[2][0] + str(pc[2][1])}")
+            else:
+                bacbed.add_field(name=f"{uname}のカード",
+                                 value=f"{pc[0][0] + str(pc[0][1])}\n{pc[1][0] + str(pc[1][1])}")
+            if len(bc) > 2:
+                await ctx.send(f"バンカーは'{bc[2][0] + str(bc[2][1])}'を引きました。")
+                bacbed.add_field(name=f"バンカーのカード",
+                                 value=f"{bc[0][0] + str(bc[0][1])}\n{bc[1][0] + str(bc[1][1])}"
+                                       f"\n{bc[2][0] + str(bc[2][1])}")
+            else:
+                bacbed.add_field(name=f"バンカーのカード",
+                                 value=f"{bc[0][0] + str(bc[0][1])}\n{bc[1][0] + str(bc[1][1])}")
+            money2, level, cnt, ccnt = rdinf(row)
+            bacbed.add_field(name=f"ガードの合計", value=f"{uname}:{pce}\nバンカー:{bce}")
+            if batrslt == 'p':
+                bacbed.add_field(name=f"あなたの賭け", value=f"{uname}の勝利に{batmny}円")
+            elif batrslt == 'b':
+                bacbed.add_field(name=f"あなたの賭け", value=f"バンカーの勝利に{batmny}円")
+            else:
+                bacbed.add_field(name=f"あなたの賭け", value=f"タイ(引き分け)に{batmny}円")
+            bacbed.add_field(name=f"{uname}の所持金", value=f"{money}円 -> {money2}円", inline=False)
+            await ctx.send(embed=bacbed)
+        else:
+            await ctx.send("プレイヤー(p)か、バンカー(b)か、タイ(t)に賭けてください")
+
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 

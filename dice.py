@@ -67,3 +67,102 @@ def batdice(maxn):
 
 def dihyaku():
     return randrange(1, 101)
+
+
+def trmpset():
+    trump = []
+    mark = ['◇', '♤', '♡', '♧']
+    for m in mark:
+        for n in range(1, 13):
+            trump.append([m, n])
+    return trump
+
+
+def bacrst(pcs, bcs):
+    if sum(pcs) % 10 == sum(bcs) % 10:
+        result = 't'
+    elif sum(pcs) % 10 < sum(bcs) % 10:
+        result = 'b'
+    else:
+        result = 'p'
+    return result
+
+
+def bac():
+    trump = trmpset()
+    pc = []
+    pcs = []
+    bc = []
+    bcs = []
+    pick = []
+    for x in range(1,5):
+        idx = randrange(0, len(trump))
+        pick.append(trump.pop(idx))
+    pc.append(pick[0])
+    pc.append(pick[3])
+    bc.append(pick[1])
+    bc.append(pick[2])
+    for card in pc:
+        if card[1] >= 10:
+            pcs.append[0]
+        else:
+            pcs.append[card[1]]
+    for card in bc:
+        if card[1] >= 10:
+            bcs.append[0]
+        else:
+            bcs.append[card[1]]
+    if sum(pcs) % 10 >= 8 or sum(bcs) % 10 >= 8:
+        result = bacrst(pcs, bcs)
+    elif sum(pcs) % 10 >= 6:
+        if sum(bcs) % 10 >= 6:
+            result = bacrst(pcs, bcs)
+        else:
+            idx = randrange(0, len(trump))
+            bc.append(trump.pop(idx))
+            if bc[2][1] >= 10:
+                bcs.append[0]
+            else:
+                bcs.append[bc[2][1]]
+            result = bacrst(pcs, bcs)
+    else:
+        idx = randrange(0, len(trump))
+        pc.append(trump.pop(idx))
+        if pc[2][1] >= 10:
+            pcs.append[0]
+        else:
+            pcs.append[pc[2][1]]
+        if 6 >= sum(bcs) % 10 >= 3:
+            mn = 8-((7-(sum(bcs) % 10))*2)
+            if 7 >= pcs[2] >= mn or (sum(bcs) % 10 == 3 and pcs[2] == 9):
+                idx = randrange(0, len(trump))
+                bc.append(trump.pop(idx))
+                if bc[2][1] >= 10:
+                    bcs.append[0]
+                else:
+                    bcs.append[bc[2][1]]
+        if sum(bcs) % 10 <= 2:
+            idx = randrange(0, len(trump))
+            bc.append(trump.pop(idx))
+            if bc[2][1] >= 10:
+                bcs.append[0]
+            else:
+                bcs.append[bc[2][1]]
+        result = bacrst(pcs, bcs)
+    pce = sum(pcs) % 10
+    bce = sum(bcs) % 10
+    for idx in range(0, len(pc)):
+        if pc[idx][1] == 11:
+            pc[idx][1] = 'J'
+        elif pc[idx][1] == 12:
+            pc[idx][1] = 'Q'
+        elif pc[idx][1] == 13:
+            pc[idx][1] = 'K'
+    for idx in range(0, len(bc)):
+        if bc[idx][1] == 11:
+            bc[idx][1] = 'J'
+        elif bc[idx][1] == 12:
+            bc[idx][1] = 'Q'
+        elif bc[idx][1] == 13:
+            bc[idx][1] = 'K'
+    return pc, bc, result, pce, bce
