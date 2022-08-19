@@ -746,6 +746,12 @@ async def baccarat(ctx, batrslt, batting):
                 bacbed.add_field(name=f"あなたの賭け", value=f"タイ(引き分け)に{batmny}円")
             bacbed.add_field(name=f"{uname}の所持金", value=f"{money}円 -> {money2}円", inline=False)
             await ctx.send(embed=bacbed)
+            cscnt = cascnt(row)
+            if (cscnt + 1) % 1000 == 0:
+                money, level, cnt, ccnt = rdinf(row)
+                edtmny(row, money + ((cscnt + 1) * 20))
+                await ctx.send("実績解禁！！\n{}はカジノに{}回通いました。\n頑張ったから{}円あげちゃう"
+                               .format(ctx.author.mention, cscnt + 1, (cscnt + 1) * 20))
         else:
             await ctx.send("プレイヤー(p)か、バンカー(b)か、タイ(t)に賭けてください")
 
