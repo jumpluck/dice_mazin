@@ -443,7 +443,7 @@ async def diceate(ctx, ans, bat):
                     diabed.add_field(name="ダイスの出目", value="{}  偶数".format(da))
                 else:
                     diabed.add_field(name="ダイスの出目", value="{}  奇数".format(da))
-                if int(ans) == 1:
+                if int(ans) % 2 == 1:
                     diabed.add_field(name="{}の予想".format(ctx.author.name), value=f"{ans}  奇数")
                 else:
                     diabed.add_field(name="{}の予想".format(ctx.author.name), value=f"{ans}  偶数")
