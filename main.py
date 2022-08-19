@@ -429,7 +429,7 @@ async def diceate(ctx, ans, bat):
                 if da == int(ans):
                     edtmny(row, money + (int(bat) * 2))
                     diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！\n掛け金 : {bat}円", color=0xC49C48)
-                elif (da % 2 == 0 and int(ans) == 2) or (da % 2 == 1 and int(ans) == 1):
+                elif (da % 2 == 0 and int(ans) % 2 == 0) or (da % 2 == 1 and int(ans) % 2 == 1):
                     edtmny(row, money + int(bat))
                     diabed = discord.Embed(title="勝　利", description="100面ダイスの出目を当てよう！"
                                                                     "\n掛け金 : {}円".format(bat), color=0x06508D)
@@ -461,7 +461,7 @@ async def diceate(ctx, ans, bat):
         else:
             await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
     else:
-        await ctx.send("1か2を選んでください\n1:奇数、2:偶数".format(ctx.author.mention))
+        await ctx.send("1~100の中で選んでください")
 
 
 @bot.command(aliases=['c', 'カジノ'])
