@@ -673,16 +673,16 @@ async def uketetatsu(ctx, money, dicemen):
                 batbed.add_field(name="対戦結果", value="引き分け", inline=False)
             elif (s_dice == 1) or (u_dice == int(dicemen)) or (u_dice + (u_level ** 2)) < (s_dice + (s_level ** 2)):
                 batbed.add_field(name="対戦結果", value=f"{s_name}の勝ち", inline=False)
-                edtmny(row, u_money-batmny)
-                edtmny(uke, s_money+batmny)
-                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money + batmny}円", inline=False)
-                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money - batmny}円", inline=False)
+                edtmny(row, u_money - batmny)
+                edtmny(uke, s_money + batmny)
+                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money + batmny}円")
+                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money - batmny}円")
             else:
                 batbed.add_field(name="対戦結果", value=f"{u_name}の勝ち", inline=False)
                 edtmny(row, u_money + batmny)
                 edtmny(uke, s_money - batmny)
-                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money - batmny}円", inline=False)
-                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money + batmny}円", inline=False)
+                batbed.add_field(name=f"{s_name}の所持金", value=f"{s_money}円 -> {s_money - batmny}円")
+                batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money + batmny}円")
             battlee(uke, row)
             await ctx.send(embed=batbed)
         else:
