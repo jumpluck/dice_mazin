@@ -706,10 +706,10 @@ async def baccarat(ctx, batrslt, batting):
             pc, bc, result, pce, bce = bac()
             money, level, cnt, ccnt = rdinf(row)
             batmny = min(money, int(batting))
-            await ctx.send(f"{ctx.author.mention}は'{pc[0][0]+str(pc[0][1])}'と'{pc[1][0]+str(pc[1][1])}'を引きました。")
-            await ctx.send(f"バンカーは'{bc[0][0] + str(bc[0][1])}'と'{bc[1][0] + str(bc[1][1])}'を引きました。")
+            await ctx.send(f"{ctx.author.mention}は '{pc[0][0]+str(pc[0][1])}' と '{pc[1][0]+str(pc[1][1])}' を引きました。")
+            await ctx.send(f"バンカーは '{bc[0][0] + str(bc[0][1])}' と '{bc[1][0] + str(bc[1][1])}' を引きました。")
             if result == batrslt:
-                bacbed = discord.Embed(title="バカラ", description="勝ち！", color=0xB6E4FE)
+                bacbed = discord.Embed(title="バカラ", description="あなたの勝ち！", color=0xB6E4FE)
                 if batrslt == 't':
                     edtmny(row, money+(int(batmny)*8))
                 elif batrslt == 'p':
@@ -717,25 +717,27 @@ async def baccarat(ctx, batrslt, batting):
                 else:
                     edtmny(row, money + ceil(int(batmny)*0.95))
             else:
-                bacbed = discord.Embed(title="バカラ", description="負け！", color=0xFEE1F5)
+                bacbed = discord.Embed(title="バカラ", description="あなたの負け！", color=0xFEE1F5)
                 edtmny(row, money - int(batmny))
             if len(pc) > 2:
-                await ctx.send(f"{ctx.author.mention}は'{pc[2][0] + str(pc[2][1])}'を引きました。")
+                await ctx.send(f"{ctx.author.mention}は '{pc[2][0] + str(pc[2][1])}' を引きました。")
                 bacbed.add_field(name=f"{uname}のカード", value=f"{pc[0][0]+str(pc[0][1])}\n"
                                                             f"{pc[1][0]+str(pc[1][1])}\n{pc[2][0] + str(pc[2][1])}")
             else:
+                await ctx.send(f"{ctx.author.mention} スタンド")
                 bacbed.add_field(name=f"{uname}のカード",
                                  value=f"{pc[0][0] + str(pc[0][1])}\n{pc[1][0] + str(pc[1][1])}")
             if len(bc) > 2:
-                await ctx.send(f"バンカーは'{bc[2][0] + str(bc[2][1])}'を引きました。")
+                await ctx.send(f"バンカーは '{bc[2][0] + str(bc[2][1])}' を引きました。")
                 bacbed.add_field(name=f"バンカーのカード",
                                  value=f"{bc[0][0] + str(bc[0][1])}\n{bc[1][0] + str(bc[1][1])}"
                                        f"\n{bc[2][0] + str(bc[2][1])}")
             else:
+                await ctx.send(f"バンカー スタンド")
                 bacbed.add_field(name=f"バンカーのカード",
                                  value=f"{bc[0][0] + str(bc[0][1])}\n{bc[1][0] + str(bc[1][1])}")
             money2, level, cnt, ccnt = rdinf(row)
-            bacbed.add_field(name=f"ガードの合計", value=f"{uname}:{pce}\nバンカー:{bce}")
+            bacbed.add_field(name=f"ガードの合計", value=f"{uname}:{pce}\nバンカー:{bce}", inline=False)
             if batrslt == 'p':
                 bacbed.add_field(name=f"あなたの賭け", value=f"{uname}の勝利に{batmny}円")
             elif batrslt == 'b':

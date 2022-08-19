@@ -95,7 +95,7 @@ def bac():
     bc = []
     bcs = []
     pick = []
-    for x in range(1,5):
+    for x in range(1, 5):
         idx = randrange(0, len(trump))
         pick.append(trump.pop(idx))
     pc.append(pick[0])
@@ -104,14 +104,14 @@ def bac():
     bc.append(pick[2])
     for card in pc:
         if card[1] >= 10:
-            pcs.append[0]
+            pcs.append(0)
         else:
-            pcs.append[card[1]]
+            pcs.append(card[1])
     for card in bc:
         if card[1] >= 10:
-            bcs.append[0]
+            bcs.append(0)
         else:
-            bcs.append[card[1]]
+            bcs.append(card[1])
     if sum(pcs) % 10 >= 8 or sum(bcs) % 10 >= 8:
         result = bacrst(pcs, bcs)
     elif sum(pcs) % 10 >= 6:
@@ -121,33 +121,33 @@ def bac():
             idx = randrange(0, len(trump))
             bc.append(trump.pop(idx))
             if bc[2][1] >= 10:
-                bcs.append[0]
+                bcs.append(0)
             else:
-                bcs.append[bc[2][1]]
+                bcs.append(bc[2][1])
             result = bacrst(pcs, bcs)
     else:
         idx = randrange(0, len(trump))
         pc.append(trump.pop(idx))
         if pc[2][1] >= 10:
-            pcs.append[0]
+            pcs.append(0)
         else:
-            pcs.append[pc[2][1]]
+            pcs.append(pc[2][1])
         if 6 >= sum(bcs) % 10 >= 3:
             mn = 8-((7-(sum(bcs) % 10))*2)
             if 7 >= pcs[2] >= mn or (sum(bcs) % 10 == 3 and pcs[2] == 9):
                 idx = randrange(0, len(trump))
                 bc.append(trump.pop(idx))
                 if bc[2][1] >= 10:
-                    bcs.append[0]
+                    bcs.append(0)
                 else:
-                    bcs.append[bc[2][1]]
+                    bcs.append(bc[2][1])
         if sum(bcs) % 10 <= 2:
             idx = randrange(0, len(trump))
             bc.append(trump.pop(idx))
             if bc[2][1] >= 10:
-                bcs.append[0]
+                bcs.append(0)
             else:
-                bcs.append[bc[2][1]]
+                bcs.append(bc[2][1])
         result = bacrst(pcs, bcs)
     pce = sum(pcs) % 10
     bce = sum(bcs) % 10
