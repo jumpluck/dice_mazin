@@ -476,17 +476,18 @@ async def casino(ctx):
         mazinkined(mamny+100)
         ck = csnokin()
         if dc == cn:
-            casbed = discord.Embed(title="JACKPOT!!!!!!!!", description="1/1000の確率に勝ってウハウハに儲けよう！"
-                                                                        "\n賞金:{}円".format(ck), color=0xFF017E)
-            casbed.add_field(name="Jackpot Number", value="{}".format(cn), inline=False)
-            casbed.add_field(name="参加者", value="{}".format(ctx.author.name), inline=False)
-            casbed.add_field(name="結果", value="{}".format(dc), inline=False)
             money, level, cnt, ccnt = rdinf(row)
-            edtmny(row, money+ck)
+            edtmny(row, money+ck+100)
             money2, level, cnt, ccnt = rdinf(row)
             csnorst()
             csnokined(10000)
+            ck2 = csnokin()
             cn2 = csnonum()
+            casbed = discord.Embed(title="JACKPOT!!!!!!!!", description=f"1/1000の確率に勝ってウハウハに儲けよう！"
+                                                                        f"\n賞金:{ck+100}円 -> {ck2}円", color=0xFF017E)
+            casbed.add_field(name="Jackpot Number", value="{}".format(cn), inline=False)
+            casbed.add_field(name="参加者", value="{}".format(ctx.author.name), inline=False)
+            casbed.add_field(name="結果", value="{}".format(dc), inline=False)
             casbed.add_field(name="あなたの所持金", value="{}円 -> {}円".format(money, money2), inline=False)
             casbed.add_field(name="次のJackpot Number", value="{}".format(cn2), inline=False)
         elif dc == 80:
@@ -533,9 +534,10 @@ async def casino(ctx):
         elif dc == 1000:
             mazinkined(mamny + 100+ck//4)
             csnokined((ck + 100)//2)
+            ck2 = csnokin()
             await ctx.send("{}様、{}円、ありがとうございます。".format(ctx.author.mention, ck//4))
-            casbed = discord.Embed(title="ダイスルーレット", description="1/1000の確率に勝ってウハウハに儲けよう！"
-                                                                 "\n賞金:{}円".format(ck), color=0x000000)
+            casbed = discord.Embed(title="ダイスルーレット", description=f"1/1000の確率に勝ってウハウハに儲けよう！\n"
+                                                                 f"賞金:{ck+100}円 -> {ck2}円", color=0x000000)
             casbed.add_field(name="Jackpot Number", value="{}".format(cn), inline=False)
             casbed.add_field(name="参加者", value="{}".format(ctx.author.name), inline=False)
             casbed.add_field(name="結果", value="{}\nファンブル！".format(dc), inline=False)

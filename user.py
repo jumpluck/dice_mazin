@@ -208,7 +208,7 @@ def csnokined(mny):
 def csnorst():
     wb, ws = readxls()
     ws.cell(1, 2, str(csno()))
-    csnokined(10000)
+    # csnokined(10000)
     wb.save("userDB.xlsx")
     wb.close()
 
