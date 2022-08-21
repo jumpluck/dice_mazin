@@ -425,6 +425,8 @@ async def diceate(ctx, ans, bat):
         if row is not None:
             money, level, cnt, ccnt = rdinf(row)
             if money >= int(bat):
+                mamny = mazinkin()
+                mazinkined(mamny + 100)
                 da = dihyaku()
                 if da == int(ans):
                     edtmny(row, money + (int(bat) * 14))
@@ -699,6 +701,8 @@ async def baccarat(ctx, batrslt, batting):
     row = findid(ctx.author.id)
     if row is not None:
         if batrslt == 't' or batrslt == 'T' or batrslt == 'p' or batrslt == 'P' or batrslt == 'b' or batrslt == 'B':
+            mamny = mazinkin()
+            mazinkined(mamny + 100)
             if batrslt == 'T':
                 batrslt = 't'
             if batrslt == 'P':
