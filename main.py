@@ -429,12 +429,12 @@ async def diceate(ctx, ans, bat):
                 mazinkined(mamny + 100)
                 da = dihyaku()
                 if da == int(ans):
-                    edtmny(row, money + (int(bat) * 14))
-                    diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！\n掛け金 : {bat}円", color=0xC49C48)
+                    edtmny(row, money + (int(bat) * 18))
+                    diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！\n掛け金 : {bat}円 x 18倍", color=0xC49C48)
                 elif (da % 2 == 0 and int(ans) % 2 == 0) or (da % 2 == 1 and int(ans) % 2 == 1):
                     edtmny(row, money + ceil(int(bat) * 0.6))
                     diabed = discord.Embed(title="勝　利", description="100面ダイスの出目を当てよう！"
-                                                                    "\n掛け金 : {}円".format(bat), color=0x06508D)
+                                                                    "\n掛け金 : {}円 x 0.6倍".format(bat), color=0x06508D)
                 else:
                     edtmny(row, money - int(bat))
                     diabed = discord.Embed(title="敗　北", description="100面ダイスの出目を当てよう！"
