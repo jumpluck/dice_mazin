@@ -306,3 +306,16 @@ def getname(row):
     usname = ws.cell(row, c_name).value
     wb.close()
     return usname
+
+
+def ruleIDw(ID):
+    wb, ws = readxls()
+    ws.cell(1, 9, str(ID))
+    wb.save("userDB.xlsx")
+    wb.close()
+
+def ruleIDr():
+    wb, ws = readxls()
+    ruleID = ws.cell(1, 9).value
+    wb.close()
+    return ruleID

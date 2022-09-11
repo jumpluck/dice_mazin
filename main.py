@@ -4,7 +4,7 @@ import discord
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
-    getname
+    getname, ruleIDw, ruleIDr
 from dice import enchnt, csno, vsbt, batdice, dihyaku, bac
 from discord.ext import commands
 from math import ceil
@@ -430,7 +430,8 @@ async def diceate(ctx, ans, bat):
                 da = dihyaku()
                 if da == int(ans):
                     edtmny(row, money + (int(bat) * 18))
-                    diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！\n掛け金 : {bat}円 x 18倍", color=0xC49C48)
+                    diabed = discord.Embed(title="大当たり", description=f"100面ダイスの出目を当てよう！"
+                                                                     f"\n掛け金 : {bat}円 x 18倍", color=0xC49C48)
                 elif (da % 2 == 0 and int(ans) % 2 == 0) or (da % 2 == 1 and int(ans) % 2 == 1):
                     edtmny(row, money + ceil(int(bat) * 0.6))
                     diabed = discord.Embed(title="勝　利", description="100面ダイスの出目を当てよう！"
@@ -765,5 +766,38 @@ async def baccarat(ctx, batrslt, batting):
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
+
+@bot.event
+async def on_message(message):
+    if message.content.startswith('!역할분배'):
+        msgking = await message.channel.send("ゲームお誘いとかに@ everyoneを使うのは迷惑かけるのかなと分けようかと思います。"
+                                         "\nお誘いのメンションを貰っても良いって方は⭕を押してください"
+                                         "\nメンションに巻き込むのがいやな方は❌を押してください"
+                                         "\nこれからは大事な告知以外は全部@活動部員でメンション致します。"
+                                         "\n何時でもここでリアクション押すと自動に切り替わるので気楽に選択してください")
+        await msgking.add_reaction("⭕")
+        await msgking.add_reaction("❌")
+        ruleIDw(msgking.id)
+    await bot.process_commands(message)
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user.bot == 1:   #봇이면 패스
+        return None
+    mesID = ruleIDr()
+    role = discord.utils.get(user.guild.roles, name="活動部員")
+    if str(reaction.message.id) == mesID:
+        if str(reaction.emoji) == "⭕":
+            await reaction.message.channel.send(user.name + "님이 step 아이템을 구매")
+            if role not in user.roles:
+                await user.add_roles(role)
+            await reaction.remove(user)
+        if str(reaction.emoji) == "❌":
+            await reaction.message.channel.send(user.name + "님이 stun 아이템을 구매")
+            if role in user.roles:
+                await user.remove_roles(role)
+            await reaction.remove(user)
+    await bot.process_commands(reaction.message)
 
 bot.run(token)
