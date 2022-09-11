@@ -770,7 +770,7 @@ async def baccarat(ctx, batrslt, batting):
 @bot.event
 async def on_message(message):
     if message.content.startswith('!역할분배'):
-        msgking = await message.channel.send("ゲームお誘いとかに@ everyoneを使うのは迷惑かけるのかなと分けようかと思います。"
+        msgking = await message.channel.send("ゲームお誘いとかに@everyoneを使うのは迷惑かけるのかなと分けようかと思います。"
                                          "\nお誘いのメンションを貰っても良いって方は⭕を押してください"
                                          "\nメンションに巻き込むのがいやな方は❌を押してください"
                                          "\nこれからは大事な告知以外は全部@活動部員でメンション致します。"
@@ -789,12 +789,10 @@ async def on_reaction_add(reaction, user):
     role = discord.utils.get(user.guild.roles, name="活動部員")
     if str(reaction.message.id) == mesID:
         if str(reaction.emoji) == "⭕":
-            await reaction.message.channel.send(user.name + "님이 step 아이템을 구매")
             if role not in user.roles:
                 await user.add_roles(role)
             await reaction.remove(user)
         if str(reaction.emoji) == "❌":
-            await reaction.message.channel.send(user.name + "님이 stun 아이템을 구매")
             if role in user.roles:
                 await user.remove_roles(role)
             await reaction.remove(user)
