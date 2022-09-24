@@ -4,22 +4,64 @@ import discord
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
-    getname, ruleIDw, ruleIDr
+    getname
 from dice import enchnt, csno, vsbt, batdice, dihyaku, bac
 from discord.ext import commands
 from math import ceil
+
+
+def dtsv_bot():
+    datasave()
+    sched.pause()
+
 
 token = open("token.txt", "r").readline()
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix="$", intents=intents)  # 접두사를 $로 지정
 sched = BackgroundScheduler()
-sched.add_job(datasave, 'interval', seconds=10)
 sched.start()
+sched.add_job(dtsv_bot, 'interval', seconds=5, id="base")
 
 
 @bot.event
 async def on_ready():
     print("We have logged in as {0.user}".format(bot))
+
+
+# @bot.event
+# async def on_message(message):
+#     if message.content.startswith('!역할분배'):
+#         msgking = await message.channel.send("ゲームお誘いとかに@everyoneを使うのは迷惑かけるのかなと分けようかと思います。"
+#                                          "\nお誘いのメンションを貰っても良いって方は⭕を押してください"
+#                                          "\nメンションに巻き込むのがいやな方は❌を押してください"
+#                                          "\nこれからは大事な告知以外は全部@活動部員でメンション致します。"
+#                                          "\n何時でもここでリアクション押すと自動に切り替わるので気楽に選択してください")
+#         await msgking.add_reaction("⭕")
+#         await msgking.add_reaction("❌")
+#         ruleIDw(msgking.id)
+#     await bot.process_commands(message)
+
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    msg_id = payload.message_id
+    if msg_id != 1018431463902941304:
+        return None
+    guild_id = payload.guild_id
+    user_id = payload.user_id
+    role_id = 881713001529483414
+    channel_id = payload.channel_id
+    guild = bot.get_guild(guild_id)
+    channel = bot.get_channel(channel_id)
+    msg = await channel.fetch_message(msg_id)
+    role = guild.get_role(role_id)
+    user = await guild.fetch_member(user_id)
+    if str(payload.emoji.name) == "⭕":
+        await user.add_roles(role)
+    elif str(payload.emoji.name) == "❌":
+        await user.remove_roles(role)
+    await msg.remove_reaction(payload.emoji, user)
+    await bot.process_commands(msg)
 
 
 @bot.command()
@@ -47,6 +89,7 @@ async def account(ctx):
     else:
         signup(ctx.author.name, ctx.author.id)
         await ctx.send("ダイスの世界へようこそ！")
+        sched.resume()
 
 
 @bot.command()
@@ -59,6 +102,7 @@ async def el(ctx, user: discord.User, lvl):
     if row is not None:
         edtlvl(row, int(lvl))
         await ctx.send("{}のレベルを{}に設定しました".format(user.mention, lvl))
+        sched.resume()
     else:
         await ctx.send("{}はダイスの住民ではありません".format(user.mention))
 
@@ -73,6 +117,7 @@ async def em(ctx, user: discord.User, mny):
     if row is not None:
         edtmny(row, int(mny))
         await ctx.send("{}のお金を{}に設定しました".format(user.mention, mny))
+        sched.resume()
     else:
         await ctx.send("{}はダイスの住民ではありません".format(user.mention))
 
@@ -82,6 +127,7 @@ async def rst(ctx):
     if hex(ctx.author.id) == "0x9e8818f3342007b":
         rstdat()
         await ctx.send("リセット完了")
+        sched.resume()
     else:
         await ctx.send("権限がありません")
 
@@ -202,6 +248,7 @@ async def enchant(ctx):
                 else:
                     await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。".format(ctx.author.mention,
                                                                                 str(money-100)))
+            sched.resume()
         else:
             await ctx.send("果たし状を処理するまでは強化できません。")
     else:
@@ -254,6 +301,7 @@ async def specialenchant(ctx):
                             mazinkined(mamny + daikin)
                             await ctx.send("強化失敗、{}は何も得られませんでした。\n所持金が{}円残りました。"
                                            .format(ctx.author.mention, str(money-daikin)))
+            sched.resume()
         else:
             await ctx.send("果たし状を処理するまでは強化できません。")
     else:
@@ -301,6 +349,7 @@ async def enchantren(ctx, num):
                     await ctx.send(embed=kyobed)
                     money, level, cnt, ccnt = rdinf(row)
                     await ctx.send("{}のダイスは＋{}になった！".format(ctx.author.mention, str(level)))
+                sched.resume()
             else:
                 await ctx.send("果たし状を処理するまでは強化できません。")
         else:
@@ -410,6 +459,7 @@ async def vsbot(ctx, bat):
                                          .format(calbotlvl() - botlvl), inline=False)
                     botbed.set_footer(text="魔人のダイス:＋{}(プレイヤーの強化平均値 + 魔人の機嫌補正)".format(botlvl))
                     await ctx.send(embed=botbed)
+                sched.resume()
             else:
                 await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
         else:
@@ -459,6 +509,7 @@ async def diceate(ctx, ans, bat):
                     edtmny(row, money + ((cscnt + 1) * 10))
                     await ctx.send("実績解禁！！\n{}はカジノに{}回通いました。\n頑張ったから{}円あげちゃう"
                                    .format(ctx.author.mention, cscnt + 1, (cscnt + 1) * 10))
+                sched.resume()
             else:
                 await ctx.send("{}は有り金全部溶かしたので、{}円なんて出せないです".format(ctx.author.mention, bat))
         else:
@@ -557,6 +608,7 @@ async def casino(ctx):
             edtmny(row, money + ((cscnt+1)*20))
             await ctx.send("実績解禁！！\n{}はカジノに{}回通いました。\n頑張ったから{}円あげちゃう"
                            .format(ctx.author.mention, cscnt+1, (cscnt+1)*20))
+        sched.resume()
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
@@ -572,6 +624,7 @@ async def battle(ctx, dice):
             dc = batdice(int(dice))
             await ctx.send("使用ダイス:{}面ダイス\n{}の出目:{}＋ダイスの効果:{}\n合計:{}"
                            .format(dice, ctx.author.mention, dc, level**2, dc+(level**2)))
+            sched.resume()
         else:
             await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
@@ -598,6 +651,7 @@ async def sendmoney(ctx, user: discord.User, mny):
                         senbed.add_field(name="あなたの所持金", value="{}円".format(str(money-int(mny))))
                         senbed.add_field(name="{}の所持金".format(user.name), value="{}円".format(str(money2+int(mny))))
                         await ctx.send(embed=senbed)
+                        sched.resume()
                     else:
                         await ctx.send("{}は貧乏過ぎて送金出来ません".format(ctx.author.mention))
         else:
@@ -639,6 +693,7 @@ async def hatasijou(ctx, user: discord.User):
             await ctx.send(f"{ctx.author.mention}は{user.mention}に果たし状を出しました。")
         else:
             await ctx.send(f"既に誰かとバトルの準備をしてます。")
+        sched.resume()
     elif row is None:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
     else:
@@ -691,6 +746,7 @@ async def uketetatsu(ctx, dicemen, money):
                 batbed.add_field(name=f"{u_name}の所持金", value=f"{u_money}円 -> {u_money + batmny}円")
             battlee(uke, row)
             await ctx.send(embed=batbed)
+            sched.resume()
         else:
             await ctx.send("{}は誰からでも果たし状を受けてません".format(ctx.author.mention))
     else:
@@ -760,42 +816,12 @@ async def baccarat(ctx, batrslt, batting):
                 edtmny(row, money + ((cscnt + 1) * 20))
                 await ctx.send("実績解禁！！\n{}はカジノに{}回通いました。\n頑張ったから{}円あげちゃう"
                                .format(ctx.author.mention, cscnt + 1, (cscnt + 1) * 20))
+            sched.resume()
         else:
             await ctx.send("プレイヤー(p)か、バンカー(b)か、タイ(t)に賭けてください")
 
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
-
-@bot.event
-async def on_message(message):
-    if message.content.startswith('!역할분배'):
-        msgking = await message.channel.send("ゲームお誘いとかに@everyoneを使うのは迷惑かけるのかなと分けようかと思います。"
-                                         "\nお誘いのメンションを貰っても良いって方は⭕を押してください"
-                                         "\nメンションに巻き込むのがいやな方は❌を押してください"
-                                         "\nこれからは大事な告知以外は全部@活動部員でメンション致します。"
-                                         "\n何時でもここでリアクション押すと自動に切り替わるので気楽に選択してください")
-        await msgking.add_reaction("⭕")
-        await msgking.add_reaction("❌")
-        ruleIDw(msgking.id)
-    await bot.process_commands(message)
-
-
-@bot.event
-async def on_reaction_add(reaction, user):
-    if user.bot == 1:   #봇이면 패스
-        return None
-    mesID = ruleIDr()
-    role = discord.utils.get(user.guild.roles, name="活動部員")
-    if str(reaction.message.id) == mesID:
-        if str(reaction.emoji) == "⭕":
-            if role not in user.roles:
-                await user.add_roles(role)
-            await reaction.remove(user)
-        if str(reaction.emoji) == "❌":
-            if role in user.roles:
-                await user.remove_roles(role)
-            await reaction.remove(user)
-    await bot.process_commands(reaction.message)
 
 bot.run(token)
