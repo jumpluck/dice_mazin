@@ -42,26 +42,26 @@ async def on_ready():
 #     await bot.process_commands(message)
 
 
-@bot.event
-async def on_raw_reaction_add(payload):
-    msg_id = payload.message_id
-    if msg_id != 1018431463902941304:
-        return None
-    guild_id = payload.guild_id
-    user_id = payload.user_id
-    role_id = 881713001529483414
-    channel_id = payload.channel_id
-    guild = bot.get_guild(guild_id)
-    channel = bot.get_channel(channel_id)
-    msg = await channel.fetch_message(msg_id)
-    role = guild.get_role(role_id)
-    user = await guild.fetch_member(user_id)
-    if str(payload.emoji.name) == "⭕":
-        await user.add_roles(role)
-    elif str(payload.emoji.name) == "❌":
-        await user.remove_roles(role)
-    await msg.remove_reaction(payload.emoji, user)
-    await bot.process_commands(msg)
+#@bot.event
+# async def on_raw_reaction_add(payload):
+#     msg_id = payload.message_id
+#     if msg_id != 1018431463902941304:
+#         return None
+#     guild_id = payload.guild_id
+#     user_id = payload.user_id
+#     role_id = 881713001529483414
+#     channel_id = payload.channel_id
+#     guild = bot.get_guild(guild_id)
+#     channel = bot.get_channel(channel_id)
+#     msg = await channel.fetch_message(msg_id)
+#     role = guild.get_role(role_id)
+#     user = await guild.fetch_member(user_id)
+#     if str(payload.emoji.name) == "⭕":
+#         await user.add_roles(role)
+#     elif str(payload.emoji.name) == "❌":
+#         await user.remove_roles(role)
+#     await msg.remove_reaction(payload.emoji, user)
+#     await bot.process_commands(msg)
 
 
 @bot.command()
