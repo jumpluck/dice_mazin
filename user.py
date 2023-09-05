@@ -17,7 +17,7 @@ c_seme = 8
 c_uke = 9
 c_sudoku = 10
 c_sdk_prize = 11
-
+data_range = 'A1:K50'
 default_money = 10000
 default_lvl = 0
 default_cnt = 3
@@ -88,7 +88,7 @@ def cnntgsr():
 
 def dataget():
     wsg = cnntgsr()
-    range_list = wsg.range('A1:J50')
+    range_list = wsg.range(data_range)
     wb = Workbook()
     ws = wb.active
     for cel in range_list:
@@ -102,13 +102,13 @@ def datasave():
     cel = []
     cels = []
     wb, ws = readxls()
-    cell_range = ws['A1:J50']
+    cell_range = ws[data_range]
     for idx in cell_range:
         for idy in idx:
             cel.append(idy.value)
         cels.append(cel)
         cel = []
-    wsg.update('A1:J50', cels)
+    wsg.update(data_range, cels)
     wb.close()
     # print('save complete')
 
@@ -191,8 +191,8 @@ def rstdat():
             ws.cell(row, c_mazk, str(default_mazk))
             ws.cell(row, c_seme, str(0))
             ws.cell(row, c_uke, str(0))
-            ws.cell(_row, c_sudoku, str(0))
-            ws.cell(_row, c_sdk_prize, str(0))
+            ws.cell(row, c_sudoku, str(0))
+            ws.cell(row, c_sdk_prize, str(0))
         else:
             break
     ws.cell(1, 2, str(csno()))
