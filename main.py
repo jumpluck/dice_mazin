@@ -91,7 +91,7 @@ async def sudoku_play(ctx):
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
         
-@bot.command(aliases=['wrt', '書く'])
+@bot.command(aliases=['w', '書く'])
 async def sudoku_set(ctx, cord, ans):
     row = findid(ctx.author.id)
     if row is not None:
