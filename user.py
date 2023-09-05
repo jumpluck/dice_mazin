@@ -6,7 +6,6 @@ from dice import csno
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-
 c_name = 1
 c_id = 2
 c_money = 3
@@ -16,6 +15,8 @@ c_casnk = 6
 c_mazk = 7
 c_seme = 8
 c_uke = 9
+c_sudoku = 10
+c_sdk_prize = 11
 
 default_money = 10000
 default_lvl = 0
@@ -38,6 +39,30 @@ default_cascnt = 0
 #     ws.cell(row=1, column=7, value=default_maz)
 #     wb.save("userDB.xlsx")
 
+def savesuko(_row, table, prize):
+    wb, ws = readxls()
+    #보드판 문자열 하나로 합치기
+    if table != 0:
+        for l in range(9):
+            table[l] = ','.join(list(map(str,table[l])))
+        table = '/'.join(list(map(str,table)))
+    else:
+        table = str(table)
+    ws.cell(_row, c_sudoku, table)
+    ws.cell(_row, c_sdk_prize, str(prize))
+    wb.save("userDB.xlsx")
+    wb.close()
+    
+def readsuko(_row):
+    wb, ws = readxls()
+    table = ws.cell(_row, c_sudoku).value
+    #문자열 보드판배열로 복구
+    if table != '0':
+        table = table.split('/')
+        for l in range(9):
+            table[l] = table[l].split(',')
+    prize = ws.cell(_row, c_sdk_prize).value
+    return table, prize
 
 def readxls():
     if not os.path.isfile("userDB.xlsx"):
@@ -63,7 +88,7 @@ def cnntgsr():
 
 def dataget():
     wsg = cnntgsr()
-    range_list = wsg.range('A1:I50')
+    range_list = wsg.range('A1:J50')
     wb = Workbook()
     ws = wb.active
     for cel in range_list:
@@ -77,13 +102,13 @@ def datasave():
     cel = []
     cels = []
     wb, ws = readxls()
-    cell_range = ws['A1:I50']
+    cell_range = ws['A1:J50']
     for idx in cell_range:
         for idy in idx:
             cel.append(idy.value)
         cels.append(cel)
         cel = []
-    wsg.update('A1:I50', cels)
+    wsg.update('A1:J50', cels)
     wb.close()
     # print('save complete')
 
@@ -109,6 +134,8 @@ def signup(_name, _id):
     ws.cell(_row, c_mazk, str(default_mazk))
     ws.cell(_row, c_seme, str(0))
     ws.cell(_row, c_uke, str(0))
+    ws.cell(_row, c_sudoku, str(0))
+    ws.cell(_row, c_sdk_prize, str(0))
     wb.save("userDB.xlsx")
     wb.close()
 
@@ -164,6 +191,8 @@ def rstdat():
             ws.cell(row, c_mazk, str(default_mazk))
             ws.cell(row, c_seme, str(0))
             ws.cell(row, c_uke, str(0))
+            ws.cell(_row, c_sudoku, str(0))
+            ws.cell(_row, c_sdk_prize, str(0))
         else:
             break
     ws.cell(1, 2, str(csno()))

@@ -4,10 +4,11 @@ import discord
 from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
-    getname
+    getname, savesuko, readsuko 
 from dice import enchnt, csno, vsbt, batdice, dihyaku, bac
 from discord.ext import commands
 from math import ceil
+from sudoku import sudoku_ans_set, sudoku_prt_str, sudoku_make_problem, chk_sudoku, sudoku_create
 
 
 def dtsv_bot():
@@ -27,7 +28,7 @@ sched.add_job(dtsv_bot, 'interval', seconds=5, id="base")
 async def on_ready():
     print("We have logged in as {0.user}".format(bot))
 
-
+"""
 # @bot.event
 # async def on_message(message):
 #     if message.content.startswith('!역할분배'):
@@ -62,6 +63,111 @@ async def on_ready():
 #         await user.remove_roles(role)
 #     await msg.remove_reaction(payload.emoji, user)
 #     await bot.process_commands(msg)
+"""
+
+@bot.command(aliases=['sdk', '数独'])
+async def sudoku_play(ctx):
+    #문제 난이도 MxN 최대 삭제수 MnM 최소 삭제수
+    MxN = 2
+    MnN = 1
+    row = findid(ctx.author.id)
+    if row is not None:
+        sdk_tb, sdk_prize = readsuko(row)
+        if sdk_prize == '0':
+            money, level, cnt, ccnt = rdinf(row)
+            if money < 1000:
+                await ctx.send("お金が足りません、一回プレイに1000円です")
+            else:
+                edtmny(row, money-1000)
+                sdk_rw = sudoku_create()
+                sdk_tb, deln = sudoku_make_problem(sdk_rw, MnN, MxN)
+                sdk_prize = (deln**2) * 100
+                savesuko(row, sdk_tb, sdk_prize)
+                sdk_tb, sdk_prize = readsuko(row)
+                await ctx.send(f"数独プレイに1000円使いました\n所持金 : {money}円 -> {money-1000}円")
+                sdk_str = sudoku_prt_str(sdk_tb, sdk_prize, ctx.author.name)
+                await ctx.send(sdk_str)
+                sched.resume()
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+        
+@bot.command(aliases=['wrt', '書く'])
+async def sudoku_set(ctx, cord, ans):
+    row = findid(ctx.author.id)
+    if row is not None:
+        sdk_tb, sdk_prize = readsuko(row)
+        if sdk_prize == '0':
+            await ctx.send("数独をプレイしてないです、$sdkでプレイしてください")
+        else:
+            cord = cord.upper()
+            if '9'< ans or ans < '1':
+                await ctx.send("答えは１から９までの数字でお願いします")
+            elif cord[0] > cord[1]:
+                Crow = cord[0]
+                Ccol = cord[1]
+            elif cord[0] < cord[1]:
+                Crow = cord[1]
+                Ccol = cord[0]
+            else:
+                await ctx.send("座標がなんかおかしいです")
+            if 'I'>=Crow>='A' and '9'>=Ccol>='1':
+                sdk_tb_n, Errchk = sudoku_ans_set(sdk_tb, Crow, Ccol, ans)
+                if Errchk:
+                    await ctx.send(f"{Crow}{Ccol}は問題ではないです")
+                else:
+                    savesuko(row, sdk_tb_n, sdk_prize)
+                    sdk_tb_n, sdk_prize = readsuko(row)
+                    sdk_str = sudoku_prt_str(sdk_tb_n, sdk_prize, ctx.author.name)
+                    await ctx.send(sdk_str)
+                    sched.resume()
+            else:
+                await ctx.send("座標が存在しません")
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+
+@bot.command(aliases=['ans', '答え'])
+async def sudoku_ans(ctx):
+    row = findid(ctx.author.id)
+    if row is not None:
+        sdk_tb, sdk_prize = readsuko(row)
+        if sdk_prize == '0':
+            await ctx.send("数独をプレイしてないです、$sdkでプレイしてください")
+        else:
+            money, level, cnt, ccnt = rdinf(row)
+            # sdk_str = sudoku_prt_str(sdk_tb, sdk_prize, ctx.author.name)
+            # await ctx.send(sdk_str)
+            if chk_sudoku(sdk_tb):
+                edtmny(row, money + int(sdk_prize))
+                sdk_emb = discord.Embed(title="大正解", description=f"賞金 : {sdk_prize}"
+                                                                    f"\n所持金 : {money}円 -> {money+int(sdk_prize)}円", color=0xC49C48)
+                await ctx.send(embed=sdk_emb)
+                savesuko(row, 0, 0)
+            else:
+                if money >= 1000:
+                    edtmny(row, money - 1000)
+                    sdk_emb = discord.Embed(title="不正解", description=f"賞金 : {sdk_prize}"
+                                                                    f"\n所持金 : {money}円 -> {money-1000}円", color=0xD71143)
+                    await ctx.send(embed=sdk_emb)
+                else:
+                    await ctx.send("罰金の1000円がないので数独プレイを中止します")
+                    savesuko(row, 0, 0)
+            sched.resume()            
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+        
+@bot.command(aliases=['sdk_fail', '諦める'])
+async def sudoku_giveup(ctx):
+    row = findid(ctx.author.id)
+    if row is not None:
+        sdk_tb, sdk_prize = readsuko(row)
+        if sdk_prize == '0':
+            await ctx.send("数独をプレイしてないです、$sdkでプレイしてください")
+        else:
+            await ctx.send("数独から逃げました、プレイを中止します")
+            savesuko(row, 0, 0)
+            sched.resume()            
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
 
 @bot.command()
