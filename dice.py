@@ -2,6 +2,11 @@
 from random import randrange
 # 1: 성공, 2: -1, 0: 유지, 3: 리셋
 
+def roll(ko, men):
+    result = [0 for i in range(ko)]
+    for i in range(ko):
+        result[i] = randrange(1, men+1)
+    return result
 
 def enchnt(lvl):
     dc = randrange(1, 101)

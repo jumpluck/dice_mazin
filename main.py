@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from user import signup, findid, edtlvl, edtmny, rstdat, rdinf, csnorst, csnonum, calbotlvl, csnokin, csnokined, \
     mazinkin, mazinkined, macnted, mazinki, mazinkied, cascnt, rank, dataget, datasave, battlew, battler, battlee, \
     getname, savesuko, readsuko 
-from dice import enchnt, csno, vsbt, batdice, dihyaku, bac
+from dice import enchnt, csno, vsbt, batdice, dihyaku, bac, roll
 from discord.ext import commands
 from math import ceil
 from sudoku import sudoku_ans_set, sudoku_prt_str, sudoku_make_problem, chk_sudoku, sudoku_create
@@ -90,7 +90,29 @@ async def sudoku_play(ctx):
         await ctx.send(sdk_str)
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
-        
+
+@bot.command(aliases=['r', 'ダイス'])
+async def dice_roll(ctx, dice):
+    dice = dice.upper()
+    dice_inf = dice.split('D')
+    if len(dice_inf) == 2:
+        try:
+            dice_ko = int(dice_inf[0])
+            dice_men = int(dice_inf[1])
+            dice_result = roll(dice_ko, dice_men)
+            dice_sum = sum(dice_result)
+            mas = str(dice_sum)
+            mas += " ("
+            for i in range(len(dice_result)-1):
+                mas += str(dice_result[i])+"+"
+            mas += str(dice_result[len(dice_result)-1]) + ")"
+            await ctx.send(f"{ctx.author.mention}の{dice}ダイス結果 : {mas}")
+        except:
+            await ctx.send("個数や面数がおかしい！")
+    else:
+        await ctx.send("個数D面数でお願いします")
+
+    
 @bot.command(aliases=['w', '書く'])
 async def sudoku_set(ctx, cord, ans):
     row = findid(ctx.author.id)
@@ -767,7 +789,7 @@ async def sendmoney(ctx, user: discord.User, mny):
                 await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
 
-@bot.command(aliases=['r', 'ランキング'])
+@bot.command(aliases=['rank', 'ランキング'])
 async def ranking(ctx):
     rows = rank()
     # print(rows)

@@ -17,6 +17,7 @@ def sudoku_create():
     ord = [0,1,2]
     for i in range(3):
         np.random.shuffle(ord)
+        ord = list(ord)
         tmp = tb[ord[0]]
         for j in range(2):
             tb[ord[j]] = tb[ord[j+1]]
@@ -25,8 +26,9 @@ def sudoku_create():
     #열 섞기
     ord = [0,1,2]
     for i in range(3):
+        np.random.shuffle(ord)
+        ord = list(ord)
         for j in range(9):
-            np.random.shuffle(ord)
             tmp = tb[j][ord[0]]
             for k in range(2):
                 tb[j][ord[k]] = tb[j][ord[k+1]]
@@ -35,6 +37,7 @@ def sudoku_create():
     #행 덩어리 섞기
     ord = [0, 3, 6]
     np.random.shuffle(ord)
+    ord = list(ord)
     for i in range(3):
         tmp = tb[ord[0]+i]
         for j in range(2):
@@ -43,6 +46,7 @@ def sudoku_create():
     #열 덩어리 섞기
     ord = [0, 3, 6]
     np.random.shuffle(ord)
+    ord = list(ord)
     for i in range(3):
         for j in range(9):
             tmp = tb[j][ord[0]+i]
