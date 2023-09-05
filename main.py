@@ -93,8 +93,8 @@ async def sudoku_play(ctx):
 
 @bot.command(aliases=['r', 'ダイス'])
 async def dice_roll(ctx, dice):
-    dice = dice.upper()
-    dice_inf = dice.split('D')
+    dice = dice.lower()
+    dice_inf = dice.split('d')
     if len(dice_inf) == 2:
         try:
             dice_ko = int(dice_inf[0])
@@ -102,10 +102,11 @@ async def dice_roll(ctx, dice):
             dice_result = roll(dice_ko, dice_men)
             dice_sum = sum(dice_result)
             mas = str(dice_sum)
-            mas += " ("
-            for i in range(len(dice_result)-1):
-                mas += str(dice_result[i])+"+"
-            mas += str(dice_result[len(dice_result)-1]) + ")"
+            if dice_ko != 1:
+                mas += " ("
+                for i in range(len(dice_result)-1):
+                    mas += str(dice_result[i])+"+"
+                mas += str(dice_result[len(dice_result)-1]) + ")"
             await ctx.send(f"{ctx.author.mention}の{dice}ダイス結果 : {mas}")
         except:
             await ctx.send("個数や面数がおかしい！")
