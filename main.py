@@ -68,8 +68,8 @@ async def on_ready():
 @bot.command(aliases=['sdk', '数独'])
 async def sudoku_play(ctx):
     #문제 난이도 MxN 최대 삭제수 MnM 최소 삭제수
-    MxN = 2
-    MnN = 1
+    MxN = 8
+    MnN = 4
     row = findid(ctx.author.id)
     if row is not None:
         sdk_tb, sdk_prize = readsuko(row)
