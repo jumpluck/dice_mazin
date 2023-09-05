@@ -69,7 +69,7 @@ async def on_ready():
 async def sudoku_play(ctx):
     #문제 난이도 MxN 최대 삭제수 MnM 최소 삭제수
     MxN = 8
-    MnN = 4
+    MnN = 3
     row = findid(ctx.author.id)
     if row is not None:
         sdk_tb, sdk_prize = readsuko(row)
@@ -81,13 +81,13 @@ async def sudoku_play(ctx):
                 edtmny(row, money-1000)
                 sdk_rw = sudoku_create()
                 sdk_tb, deln = sudoku_make_problem(sdk_rw, MnN, MxN)
-                sdk_prize = (deln**2) * 100
+                sdk_prize = (deln//2) * 100
                 savesuko(row, sdk_tb, sdk_prize)
                 sdk_tb, sdk_prize = readsuko(row)
                 await ctx.send(f"数独プレイに1000円使いました\n所持金 : {money}円 -> {money-1000}円")
-                sdk_str = sudoku_prt_str(sdk_tb, sdk_prize, ctx.author.name)
-                await ctx.send(sdk_str)
                 sched.resume()
+        sdk_str = sudoku_prt_str(sdk_tb, sdk_prize, ctx.author.name)
+        await ctx.send(sdk_str)
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
         
@@ -100,7 +100,7 @@ async def sudoku_set(ctx, cord, ans):
             await ctx.send("数独をプレイしてないです、$sdkでプレイしてください")
         else:
             cord = cord.upper()
-            if '9'< ans or ans < '1':
+            if '9'< ans or ans < '0':
                 await ctx.send("答えは１から９までの数字でお願いします")
             elif cord[0] > cord[1]:
                 Crow = cord[0]

@@ -25,8 +25,8 @@ def sudoku_create():
     #열 섞기
     ord = [0,1,2]
     for i in range(3):
-        np.random.shuffle(ord)
         for j in range(9):
+            np.random.shuffle(ord)
             tmp = tb[j][ord[0]]
             for k in range(2):
                 tb[j][ord[k]] = tb[j][ord[k+1]]
@@ -87,12 +87,15 @@ def chk_sudoku(table):
 
 def sudoku_make_problem(table, minN, maxN):
     table1 = table[:]
+    delsum = 0
     for i in range(9):
+    
         delnum = randrange(minN,maxN)
         dellist = list(np.random.choice(range(1, 9+1), delnum, replace = False))
         for j in dellist:
             table1[i][table[i].index(j)] = ' '
-    return table1, delnum
+        delsum += delnum
+    return table1, delsum
 
 def sudoku_prt_str(table, prize, name):
     msg = f"```\nプレイヤー : {name}     賞金 : {prize}\n    1   2   3   4   5   6   7   8   9\n  +===+===+===+===+===+===+===+===+===+\n"
@@ -118,7 +121,10 @@ def sudoku_prt_str(table, prize, name):
     
 def sudoku_ans_set(table, _row, _col, ans):
     if table[df_row.index(_row)][int(_col)-1] == ' ' or len(table[df_row.index(_row)][int(_col)-1]) == 3:
-        table[df_row.index(_row)][int(_col)-1] = "'"+ans+"'"
+        if int(ans) != 0:
+            table[df_row.index(_row)][int(_col)-1] = "'"+ans+"'"
+        else:
+            table[df_row.index(_row)][int(_col)-1] = ' '
         return table, False
     else:
         return table, True
