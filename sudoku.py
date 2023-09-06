@@ -14,45 +14,65 @@ def sudoku_create():
             tb[i][j] = tb[0][(((i)%3)*3 + (i)//3 + j) % 9]
     ##난수판 셔플
     #행 섞기
-    ord = [0,1,2]
-    for i in range(3):
+    for x in range(20):
+        ord = [0,1,2]
+        for i in range(3):
+            np.random.shuffle(ord)
+            ord = list(ord)
+            tmp = tb[ord[0]]
+            for j in range(2):
+                tb[ord[j]] = tb[ord[j+1]]
+            tb[ord[2]] = tmp
+            ord = np.add(ord,3)
+        #열 섞기
+        ord = [0,1,2]
+        for i in range(3):
+            np.random.shuffle(ord)
+            ord = list(ord)
+            for j in range(9):
+                tmp = tb[j][ord[0]]
+                for k in range(2):
+                    tb[j][ord[k]] = tb[j][ord[k+1]]
+                tb[j][ord[2]] = tmp
+            ord = np.add(ord,3)
+        #행 덩어리 섞기
+        ord = [0, 3, 6]
         np.random.shuffle(ord)
         ord = list(ord)
-        tmp = tb[ord[0]]
-        for j in range(2):
-            tb[ord[j]] = tb[ord[j+1]]
-        tb[ord[2]] = tmp
-        ord = np.add(ord,3)
-    #열 섞기
-    ord = [0,1,2]
-    for i in range(3):
+        for i in range(3):
+            tmp = tb[ord[0]+i]
+            for j in range(2):
+                tb[ord[j]+i] = tb[ord[j+1]+i]
+            tb[ord[2]+i] = tmp  
+        #열 덩어리 섞기
+        ord = [0, 3, 6]
         np.random.shuffle(ord)
         ord = list(ord)
-        for j in range(9):
-            tmp = tb[j][ord[0]]
-            for k in range(2):
-                tb[j][ord[k]] = tb[j][ord[k+1]]
-            tb[j][ord[2]] = tmp
-        ord = np.add(ord,3)
-    #행 덩어리 섞기
-    ord = [0, 3, 6]
-    np.random.shuffle(ord)
-    ord = list(ord)
-    for i in range(3):
-        tmp = tb[ord[0]+i]
-        for j in range(2):
-            tb[ord[j]+i] = tb[ord[j+1]+i]
-        tb[ord[2]+i] = tmp  
-    #열 덩어리 섞기
-    ord = [0, 3, 6]
-    np.random.shuffle(ord)
-    ord = list(ord)
-    for i in range(3):
-        for j in range(9):
-            tmp = tb[j][ord[0]+i]
-            for k in range(2):
-                tb[j][ord[k]+i] = tb[j][ord[k+1]+i]
-            tb[j][ord[2]+i] = tmp
+        for i in range(3):
+            for j in range(9):
+                tmp = tb[j][ord[0]+i]
+                for k in range(2):
+                    tb[j][ord[k]+i] = tb[j][ord[k+1]+i]
+                tb[j][ord[2]+i] = tmp
+        #가로세로조합 숫자 섞기
+        for j in [0,3,6]:
+            ord = list(np.random.choice(range(j, j+2+1), 2, replace = False))
+            shf_idx = []
+            shf_idx.append(randrange(0,2+1))
+            First_N = tb[ord[0]][shf_idx[0]]
+            k = 0
+            while(tmp != First_N):
+                tmp = tb[ord[1]][shf_idx[k]]
+                shf_idx.append(tb[ord[0]].index(tmp))
+                k += 1
+                # if len(shf_idx)>9:
+                #     raise
+            shf_idx.pop()
+            for k in shf_idx:
+                tmp = tb[ord[0]][k]
+                tb[ord[0]][k] = tb[ord[1]][k]
+                tb[ord[1]][k] = tmp
+        tb = list(map(list, zip(*tb)))
     return tb
 
 def chk_sudoku(table):
@@ -135,12 +155,8 @@ def sudoku_ans_set(table, _row, _col, ans):
     
     
 
-#출력
-
-# tb2[0][0] = '9'
-# print(f'dd{tb2[0][0]}')
-
-# #보드판 출력
+# tb3 = sudoku_create()
+# # #보드판 출력
 # brd = '  '
 # for l in range(9):
 #     brd += str(num[l]) + ' '
@@ -152,5 +168,5 @@ def sudoku_ans_set(table, _row, _col, ans):
 #     brd += '\n'
 # print(brd)
 
-# print('A'>'9')
-    
+# if chk_sudoku(tb3):
+#     print("ok")
