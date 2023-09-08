@@ -154,26 +154,31 @@ def get_col(table,_col):
 
 def get_rec(table,_row,_col):
     rec_data = []
-    cord = []
     for i in range((_row//3)*3,(_row//3)*3+3):
         for j in range((_col//3)*3,(_col//3)*3+3):
             rec_data.append(table[i][j])
+    return rec_data
+
+def get_rec_cord(_row,_col):
+    cord = []
+    for i in range((_row//3)*3,(_row//3)*3+3):
+        for j in range((_col//3)*3,(_col//3)*3+3):
             cord.append([i,j])
-    return rec_data, cord
+    return cord
   
 def cel_set(table, cel):
     if table[cel[0]][cel[1]] == ' ':
         table[cel[0]][cel[1]] = []
     row_chk = get_row(table,cel[0])
     col_chk = get_col(table,cel[1])
-    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    rec_chk = get_rec(table,cel[0],cel[1])
     for i in range(1,10):
         if type(table[cel[0]][cel[1]]) == list:
             if i not in row_chk and i not in col_chk and i not in rec_chk:
                 if i not in  table[cel[0]][cel[1]]:
                     table[cel[0]][cel[1]].append(i)
-                    return True , table
-    return False, table
+                    return True
+    return False
 
 def list_chk(lists, num):
     cnt = 0
@@ -187,21 +192,17 @@ def cel_chk(table, cel):
     if len(table[cel[0]][cel[1]]) == 1:
         num = table[cel[0]][cel[1]][0]
         table[cel[0]][cel[1]] = num
-        table = cel_clr_row(table, cel, num)
-        table = cel_clr_col(table, cel, num)
-        table = cel_clr_rec(table, cel, num)
-        return True, table
+        cel_clr(table, cel, num)
+        return True
     row_chk = get_row(table,cel[0])
     col_chk = get_col(table,cel[1])
-    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    rec_chk = get_rec(table,cel[0],cel[1])
     for i in table[cel[0]][cel[1]]:
         if list_chk(row_chk, i) == 1 or list_chk(col_chk, i) == 1 or list_chk(rec_chk, i) == 1:
             table[cel[0]][cel[1]] = i
-            table = cel_clr_row(table, cel, i)
-            table = cel_clr_col(table, cel, i)
-            table = cel_clr_rec(table, cel, i)
-            return True, table
-    return False, table
+            cel_clr(table, cel, i)
+            return True
+    return False
 
 def cel_clr_row(table, cel, num):
     row_chk = get_row(table,cel[0])
@@ -209,7 +210,6 @@ def cel_clr_row(table, cel, num):
         if type(row_chk[i]) == list:
             if num in row_chk[i]:
                 table[cel[0]][i].remove(num)
-    return table
 
 def cel_clr_col(table, cel, num):
     col_chk = get_col(table,cel[1])
@@ -217,60 +217,107 @@ def cel_clr_col(table, cel, num):
         if type(col_chk[i]) == list:
             if num in col_chk[i]:
                 table[i][cel[1]].remove(num)
-    return table
 
 def cel_clr_rec(table, cel, num):
-    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    rec_chk = get_rec(table,cel[0],cel[1])
+    rec_cord = get_rec_cord(cel[0],cel[1])
     for i in range(len(rec_chk)):
         if type(rec_chk[i]) == list:
             if num in rec_chk[i]:
-                table[rec_cord[i][0]][rec_cord[i][1]].remove(num)  
-    return table
+                table[rec_cord[i][0]][rec_cord[i][1]].remove(num)
 
-def sudoku_make_problem(test_list, mxn):
+def cel_clr(table, cel, num):
+    cel_clr_row(table, cel, num)
+    cel_clr_col(table, cel, num)
+    cel_clr_rec(table, cel, num)
+
+def cel_chk_roof(chk_list, del_cord):
+    setting = True
+    while(setting):
+        setting = False
+        for delc in del_cord:
+            if type(chk_list[delc[0]][delc[1]]) == list:
+                val = cel_chk(chk_list, delc)
+                # test_list_str = saveload(chk_list)
+                # list_str = sudoku_prt_str(test_list_str)
+                # print(list_str)
+                setting = setting or val
+
+def ans_chk(chk_list):
+    for i in range(9):
+        for j in range(9):
+            if type(chk_list[i][j]) == list:
+                return True
+    return False
+
+"""def two_way(ori_cel, delc, cel_chk_list, chk_list):
+    for i in range(len(cel_chk_list)):
+        if type(cel_chk_list[i]) == list:
+            if ((ori_cel == cel_chk_list[i]) or (ori_cel == cel_chk_list[i][::-1])) and (delc[1] != i):
+                cel_way=[]
+                for j in range(2):
+                    tmp_list = copy.deepcopy(chk_list)
+                    tmp_list[delc[0]][delc[1]] = ori_cel[j]
+                    cel_clr(tmp_list, delc, ori_cel[j])
+                    cel_chk_roof(tmp_list, del_cord)
+                    cel_way.append(ans_chk(tmp_list))
+                if (cel_way[0] != cel_way[1]) and (cel_way[0] or cel_way[1]):
+                    if cel_way[0]:
+                        chk_list[delc[0]][delc[1]] = ori_cel[0]
+                        cel_clr(chk_list, delc, ori_cel[0])
+                    else:
+                        chk_list[delc[0]][delc[1]] = ori_cel[1]
+                        cel_clr(chk_list, delc, ori_cel[1])
+                    return True
+    return False 
+"""
+
+def make_problem(test_list, mxn):
     cordinate = [[i,j] for i in range(9) for j in range(9)]
     del_cord = []
     np.random.shuffle(cordinate)
     while(len(cordinate)>0 and len(del_cord)<mxn):
         chk_list = copy.deepcopy(test_list)
         del_cord.append(cordinate.pop())
-        # print('pop', del_cord[::-1])
         for delc in del_cord:
             chk_list[delc[0]][delc[1]] = ' '
+            
         setting = True
         while(setting):
             setting = False
             for delc in del_cord:
-                val, chk_list = cel_set(chk_list, delc)
+                val = cel_set(chk_list, delc)
                 setting = setting or val
+                
+        cel_chk_roof(chk_list, del_cord)
 
-        setting = True
+        """setting = True
         while(setting):
-            setting = False
+            setting = False       
             for delc in del_cord:
-                if type(chk_list[delc[0]][delc[1]]) == list:
-                    val, chk_list = cel_chk(chk_list, delc)
-                    setting = setting or val
-        it_fail = False
-        for i in range(9):
-            for j in range(9):
-                if type(chk_list[i][j]) == list:
-                    # print('old', del_cord[::-1])
-                    # test_list_str1 = saveload(chk_list)
-                    # list_str1 = sudoku_prt_str(test_list_str1)
-                    # print(list_str1)
-                    del_cord.pop()
-                    # print('new', del_cord[::-1])
-                    it_fail = True
-                    break
-            if it_fail:
-                break
-        # if not it_fail:
-        #     ans_list = copy.deepcopy(chk_list)
+                ori_cel = chk_list[delc[0]][delc[1]]
+                if type(ori_cel) == list:
+                    if len(ori_cel) == 2:
+                        row_chk = get_row(chk_list,delc[0])
+                        val = two_way(ori_cel, delc, row_chk, chk_list)
+                        setting = setting or val
+                        col_chk = get_col(chk_list,delc[1])
+                        val = two_way(ori_cel, delc, col_chk, chk_list)
+                        setting = setting or val
+                        rec_chk = get_rec(chk_list,delc[0],delc[1])
+                        val = two_way(ori_cel, delc, rec_chk, chk_list)
+                        setting = setting or val
+            cel_chk_roof(chk_list, del_cord)           
+        """          
+        
+        if ans_chk(chk_list):
+            del_cord.pop()
+            
     pro_list = copy.deepcopy(test_list)
     for dc in del_cord:
         pro_list[dc[0]][dc[1]] = ' '
     deln = len(del_cord)
+    
     return pro_list, deln
 
     
