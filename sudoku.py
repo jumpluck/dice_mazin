@@ -1,5 +1,6 @@
 import numpy as np
 from random import randrange
+import copy
 
 num = [1,2,3,4,5,6,7,8,9]
 df_row = ['A','B','C','D','E','F','G','H','I']
@@ -12,9 +13,9 @@ def sudoku_create():
     for i in range(1, 9):
         for j in range(9):
             tb[i][j] = tb[0][(((i)%3)*3 + (i)//3 + j) % 9]
-    ##난수판 셔플
-    #행 섞기
-    for x in range(20):
+    ##난수판 셔플 각 20회
+    for x in range(2):
+        #행 섞기
         ord = [0,1,2]
         for i in range(3):
             np.random.shuffle(ord)
@@ -73,6 +74,7 @@ def sudoku_create():
                 tb[ord[0]][k] = tb[ord[1]][k]
                 tb[ord[1]][k] = tmp
         tb = list(map(list, zip(*tb)))
+
     return tb
 
 def chk_sudoku(table):
@@ -109,18 +111,6 @@ def chk_sudoku(table):
                     return False
     return True
 
-def sudoku_make_problem(table, minN, maxN):
-    table1 = table[:]
-    delsum = 0
-    for i in range(9):
-    
-        delnum = randrange(minN,maxN)
-        dellist = list(np.random.choice(range(1, 9+1), delnum, replace = False))
-        for j in dellist:
-            table1[i][table[i].index(j)] = ' '
-        delsum += delnum
-    return table1, delsum
-
 def sudoku_prt_str(table, prize, name):
     msg = f"```\nプレイヤー : {name}     賞金 : {prize}\n    1   2   3   4   5   6   7   8   9\n  +===+===+===+===+===+===+===+===+===+\n"
     for i in range(9):
@@ -152,7 +142,137 @@ def sudoku_ans_set(table, _row, _col, ans):
         return table, False
     else:
         return table, True
-    
+
+def get_row(table,_row):
+    return table[_row]
+
+def get_col(table,_col):
+    col_data = []
+    for i in range(9):
+        col_data.append(table[i][_col])
+    return col_data
+
+def get_rec(table,_row,_col):
+    rec_data = []
+    cord = []
+    for i in range((_row//3)*3,(_row//3)*3+3):
+        for j in range((_col//3)*3,(_col//3)*3+3):
+            rec_data.append(table[i][j])
+            cord.append([i,j])
+    return rec_data, cord
+  
+def cel_set(table, cel):
+    if table[cel[0]][cel[1]] == ' ':
+        table[cel[0]][cel[1]] = []
+    row_chk = get_row(table,cel[0])
+    col_chk = get_col(table,cel[1])
+    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    for i in range(1,10):
+        if type(table[cel[0]][cel[1]]) == list:
+            if i not in row_chk and i not in col_chk and i not in rec_chk:
+                if i not in  table[cel[0]][cel[1]]:
+                    table[cel[0]][cel[1]].append(i)
+                    return True , table
+    return False, table
+
+def list_chk(lists, num):
+    cnt = 0
+    for x in lists:
+        if type(x) == list:
+            if num in x:
+                cnt += 1
+    return cnt
+
+def cel_chk(table, cel):
+    if len(table[cel[0]][cel[1]]) == 1:
+        num = table[cel[0]][cel[1]][0]
+        table[cel[0]][cel[1]] = num
+        table = cel_clr_row(table, cel, num)
+        table = cel_clr_col(table, cel, num)
+        table = cel_clr_rec(table, cel, num)
+        return True, table
+    row_chk = get_row(table,cel[0])
+    col_chk = get_col(table,cel[1])
+    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    for i in table[cel[0]][cel[1]]:
+        if list_chk(row_chk, i) == 1 or list_chk(col_chk, i) == 1 or list_chk(rec_chk, i) == 1:
+            table[cel[0]][cel[1]] = i
+            table = cel_clr_row(table, cel, i)
+            table = cel_clr_col(table, cel, i)
+            table = cel_clr_rec(table, cel, i)
+            return True, table
+    return False, table
+
+def cel_clr_row(table, cel, num):
+    row_chk = get_row(table,cel[0])
+    for i in range(len(row_chk)):
+        if type(row_chk[i]) == list:
+            if num in row_chk[i]:
+                table[cel[0]][i].remove(num)
+    return table
+
+def cel_clr_col(table, cel, num):
+    col_chk = get_col(table,cel[1])
+    for i in range(len(col_chk)):
+        if type(col_chk[i]) == list:
+            if num in col_chk[i]:
+                table[i][cel[1]].remove(num)
+    return table
+
+def cel_clr_rec(table, cel, num):
+    rec_chk, rec_cord = get_rec(table,cel[0],cel[1])
+    for i in range(len(rec_chk)):
+        if type(rec_chk[i]) == list:
+            if num in rec_chk[i]:
+                table[rec_cord[i][0]][rec_cord[i][1]].remove(num)  
+    return table
+
+def sudoku_make_problem(test_list, mxn):
+    cordinate = [[i,j] for i in range(9) for j in range(9)]
+    del_cord = []
+    np.random.shuffle(cordinate)
+    while(len(cordinate)>0 and len(del_cord)<mxn):
+        chk_list = copy.deepcopy(test_list)
+        del_cord.append(cordinate.pop())
+        # print('pop', del_cord[::-1])
+        for delc in del_cord:
+            chk_list[delc[0]][delc[1]] = ' '
+        setting = True
+        while(setting):
+            setting = False
+            for delc in del_cord:
+                val, chk_list = cel_set(chk_list, delc)
+                setting = setting or val
+
+        setting = True
+        while(setting):
+            setting = False
+            for delc in del_cord:
+                if type(chk_list[delc[0]][delc[1]]) == list:
+                    val, chk_list = cel_chk(chk_list, delc)
+                    setting = setting or val
+        it_fail = False
+        for i in range(9):
+            for j in range(9):
+                if type(chk_list[i][j]) == list:
+                    # print('old', del_cord[::-1])
+                    # test_list_str1 = saveload(chk_list)
+                    # list_str1 = sudoku_prt_str(test_list_str1)
+                    # print(list_str1)
+                    del_cord.pop()
+                    # print('new', del_cord[::-1])
+                    it_fail = True
+                    break
+            if it_fail:
+                break
+        # if not it_fail:
+        #     ans_list = copy.deepcopy(chk_list)
+    pro_list = copy.deepcopy(test_list)
+    for dc in del_cord:
+        pro_list[dc[0]][dc[1]] = ' '
+    deln = len(del_cord)
+    return pro_list, deln
+
     
 
 # tb3 = sudoku_create()

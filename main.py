@@ -66,10 +66,9 @@ async def on_ready():
 """
 
 @bot.command(aliases=['sdk', '数独'])
-async def sudoku_play(ctx):
-    #문제 난이도 MxN 최대 삭제수 MnM 최소 삭제수
-    MxN = 8
-    MnN = 3
+async def sudoku_play(ctx, Mxn):
+    #문제 난이도 MxN 최대 삭제수
+    MxN = int(Mxn)
     row = findid(ctx.author.id)
     if row is not None:
         sdk_tb, sdk_prize = readsuko(row)
@@ -80,7 +79,7 @@ async def sudoku_play(ctx):
             else:
                 edtmny(row, money-1000)
                 sdk_rw = sudoku_create()
-                sdk_tb, deln = sudoku_make_problem(sdk_rw, MnN, MxN)
+                sdk_tb, deln = sudoku_make_problem(sdk_rw, MxN)
                 sdk_prize = (deln//2) * 100
                 savesuko(row, sdk_tb, sdk_prize)
                 sdk_tb, sdk_prize = readsuko(row)
