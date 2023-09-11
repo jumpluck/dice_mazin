@@ -13,9 +13,9 @@ def sudoku_create():
     for i in range(1, 9):
         for j in range(9):
             tb[i][j] = tb[0][(((i)%3)*3 + (i)//3 + j) % 9]
-    ##난수판 셔플 각 20회
+    ##난수판 셔플
+    #행 섞기
     for x in range(2):
-        #행 섞기
         ord = [0,1,2]
         for i in range(3):
             np.random.shuffle(ord)
@@ -56,25 +56,27 @@ def sudoku_create():
                     tb[j][ord[k]+i] = tb[j][ord[k+1]+i]
                 tb[j][ord[2]+i] = tmp
         #가로세로조합 숫자 섞기
-        for j in [0,3,6]:
-            ord = list(np.random.choice(range(j, j+2+1), 2, replace = False))
-            shf_idx = []
-            shf_idx.append(randrange(0,2+1))
-            First_N = tb[ord[0]][shf_idx[0]]
-            k = 0
-            while(tmp != First_N):
-                tmp = tb[ord[1]][shf_idx[k]]
-                shf_idx.append(tb[ord[0]].index(tmp))
-                k += 1
-                # if len(shf_idx)>9:
-                #     raise
-            shf_idx.pop()
-            for k in shf_idx:
-                tmp = tb[ord[0]][k]
-                tb[ord[0]][k] = tb[ord[1]][k]
-                tb[ord[1]][k] = tmp
+        for i in [0,3,6]:
+            ord = []
+            ord.append(list(np.random.choice(range(i, i+2+1), 2, replace = False)))
+            ord.append([i*3 - ord[0][0] - ord[0][1] + 3, ord[0][randrange(2)]])
+            for j in range(2):
+                for x in range(4):
+                    shf_idx = []
+                    shf_idx.append(randrange(0,2+1))
+                    First_N = tb[ord[j][0]][shf_idx[0]]
+                    k = 0
+                    while(tmp != First_N):
+                        tmp = tb[ord[j][1]][shf_idx[k]]
+                        shf_idx.append(tb[ord[j][0]].index(tmp))
+                        k += 1
+                    shf_idx.pop()
+                    for k in shf_idx:
+                        tmp = tb[ord[j][0]][k]
+                        tb[ord[j][0]][k] = tb[ord[j][1]][k]
+                        tb[ord[j][1]][k] = tmp
+                    tb = list(map(list, zip(*tb)))
         tb = list(map(list, zip(*tb)))
-
     return tb
 
 def chk_sudoku(table):
