@@ -14,8 +14,8 @@ def sudoku_create():
         for j in range(9):
             tb[i][j] = tb[0][(((i)%3)*3 + (i)//3 + j) % 9]
     ##난수판 셔플
-    #행 섞기
-    for x in range(2):
+    for x in range(6):
+        #행 섞기
         ord = [0,1,2]
         for i in range(3):
             np.random.shuffle(ord)
