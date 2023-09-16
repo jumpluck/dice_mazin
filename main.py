@@ -122,8 +122,14 @@ async def sudoku_set(ctx, cord, ans):
             await ctx.send("数独をプレイしてないです、$sdkでプレイしてください")
         else:
             cord = cord.upper()
-            if '9'< ans or ans < '0':
+            try:
+                ansi = int(ans)
+            except:
                 await ctx.send("答えは１から９までの数字でお願いします")
+                return
+            if 9< ansi or ansi < 0:
+                await ctx.send("答えは１から９までの数字でお願いします")
+                return
             elif cord[0] > cord[1]:
                 Crow = cord[0]
                 Ccol = cord[1]
@@ -132,18 +138,25 @@ async def sudoku_set(ctx, cord, ans):
                 Ccol = cord[0]
             else:
                 await ctx.send("座標がなんかおかしいです")
-            if 'I'>=Crow>='A' and '9'>=Ccol>='1':
+                return
+            try:
+                Ccoli = int(Ccol)
+            except:
+                await ctx.send("座標がなんかおかしいです")
+                return
+            if 'I'>=Crow>='A' and 9>=Ccoli>=1:
                 sdk_tb_n, Errchk = sudoku_ans_set(sdk_tb, Crow, Ccol, ans)
-                if Errchk:
-                    await ctx.send(f"{Crow}{Ccol}は問題ではないです")
-                else:
-                    savesuko(row, sdk_tb_n, sdk_prize)
-                    sdk_tb_n, sdk_prize = readsuko(row)
-                    sdk_str = sudoku_prt_str(sdk_tb_n, sdk_prize, ctx.author.name)
-                    await ctx.send(sdk_str)
-                    sched.resume()
             else:
-                await ctx.send("座標が存在しません")
+                await ctx.send("座標がなんかおかしいです")
+                return
+            if Errchk:
+                await ctx.send(f"{Crow}{Ccol}は問題ではないです")
+            else:
+                savesuko(row, sdk_tb_n, sdk_prize)
+                sdk_tb_n, sdk_prize = readsuko(row)
+                sdk_str = sudoku_prt_str(sdk_tb_n, sdk_prize, ctx.author.name)
+                await ctx.send(sdk_str)
+                sched.resume()
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 

@@ -150,7 +150,7 @@ def sudoku_prt_str(table, prize, name):
     return msg
     
 def sudoku_ans_set(table, _row, _col, ans):
-    if table[df_row.index(_row)][int(_col)-1] == ' ' or len(table[df_row.index(_row)][int(_col)-1]) == 3:
+    if table[df_row.index(_row)][int(_col)-1] == ' ' or len(table[df_row.index(_row)][int(_col)-1]) >= 3:
         if int(ans) != 0:
             table[df_row.index(_row)][int(_col)-1] = "'"+ans+"'"
         else:
