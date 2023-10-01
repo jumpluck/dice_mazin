@@ -1,5 +1,5 @@
 # dice.py
-from random import randrange
+from random import randrange, choices
 # 1: 성공, 2: -1, 0: 유지, 3: 리셋
 
 def roll(ko, men):
@@ -54,13 +54,100 @@ def vsbt(lvl, botlvl):
         return 4, dcpl, dcbt
     elif dcpl == 100 or dcbt == 1:
         return 5, dcpl, dcbt
-    elif (botlvl**2)+dcbt == (lvl**2)+dcpl:
+    elif (botlvl)+dcbt == (lvl)+dcpl:
         return 0, dcpl, dcbt
-    elif (botlvl**2)+dcbt < (lvl**2)+dcpl:
+    elif (botlvl)+dcbt < (lvl)+dcpl:
         return 1, dcpl, dcbt
     else:
         return 2, dcpl, dcbt
 
+def setdeck():
+    arr = [0 for i in range(3)]
+    for i in range(5):
+        arr[randrange(3)] += 1
+    return arr
+
+def calwin(player,mazin):
+    win = [0 for i in range(3)]
+    if (player[0] == 0 and player[1] == 0 and mazin[1] > 0):
+        m_p = 1
+    elif (player[0] == 0 and player[2] == 0 and mazin[0] > 0):
+        m_p = 0
+    elif (player[1] == 0 and player[2] == 0 and mazin[2] > 0):
+        m_p = 2
+    elif player[0] == 0 and player[1] > 0 and player[2] > 0 and mazin[0] > 0:
+        if mazin[1] > 0:
+            ans = choices([0,1],[1+player[1]*0.2,1+player[2]*0.5])
+            m_p = ans[0]
+        elif mazin[2] > 0:
+            ans = choices([0,2],[1+player[1]*0.5,1+player[2]*0.1])
+            m_p = ans[0]
+        else:
+            m_p = 0
+    elif player[2] == 0 and player[1] > 0 and player[0] > 0  and mazin[2] > 0:
+        if mazin[0] > 0:
+            ans = choices([2,0],[1+player[0]*0.2,1+player[1]*0.5])
+            m_p = ans[0]
+        elif mazin[1] > 0:
+            ans = choices([2,1],[1+player[0]*0.5,1+player[1]*0.1])
+            m_p = ans[0]
+        else:
+            m_p = 2     
+    elif player[1] == 0 and player[0] > 0 and player[2] > 0  and mazin[1] > 0:
+        if mazin[2] > 0:
+            ans = choices([1,2],[1+player[2]*0.2,1+player[0]*0.5])
+            m_p = ans[0]
+        elif mazin[0] > 0:
+            ans = choices([1,0],[1+player[2]*0.5,1+player[0]*0.1])
+            m_p = ans[0]
+        else:
+            m_p = 1        
+    elif (mazin[0] == 0 and player[1] > 0 and mazin[1] > 0):
+        if player[0] > 0 and mazin[2] > 0:
+            ans = choices([1,2],[2,1])
+            m_p = ans[0]
+        else:
+            m_p = 1
+    elif (mazin[2] == 0 and player[0] > 0 and mazin[0] > 0):
+        if player[2] > 0 and mazin[1] > 0:
+            ans = choices([0,1],[2,1])
+            m_p = ans[0]
+        else:
+            m_p = 0        
+    elif (mazin[1] == 0 and player[2] > 0 and mazin[2] > 0):
+        if player[1] > 0 and mazin[0] > 0:
+            ans = choices([2,0],[2,1])
+            m_p = ans[0]
+        else:
+            m_p = 2                  
+    else:
+        for i in range(3):
+            if mazin[i] > 0:
+                win[i] = max(player[(i+1)%3]-player[(i+2)%3],player[i]*0.5-player[(i+2)%3],0)
+            else:
+                win[i] = 0
+        if sum(win) == 0:
+            for i in range(3):
+                if mazin[i] > 0:
+                    win[i] = max(player[i]-player[(i+2)%3]*0.5,0)
+                else:
+                    win[i] = 0
+        if sum(win) == 0:
+            win = mazin
+        # print(win)
+        ans = choices([0,1,2],win)
+        m_p = ans[0]
+        if player[(m_p+2)%3] > 0:
+            n = choices([0,1,2,3,4],[10,10,5,2,1])
+            for i in range(n[0]):
+                if mazin[(m_p+1)%3] > 0:
+                    m_p_r = choices([m_p,(m_p+1)%3],[0.6, 0.4])
+                elif mazin[(m_p+2)%3] > 0:
+                    m_p_r = choices([m_p,(m_p+2)%3],[0.7, 0.3])
+                else:
+                    m_p_r = [m_p]
+                m_p = m_p_r[0]
+    return m_p
 
 def csno():
     return randrange(1, 1001)

@@ -17,6 +17,9 @@ c_seme = 8
 c_uke = 9
 c_sudoku = 10
 c_sdk_prize = 11
+c_janken_you = 12
+c_janken_mazin = 13
+c_janken_prise = 14
 data_range = 'A1:K50'
 default_money = 10000
 default_lvl = 0
@@ -25,6 +28,7 @@ default_csn = 10000
 default_maz = 10000
 default_mazk = 0
 default_cascnt = 0
+default_janken = 0
 
 
 # if os.path.isfile("userDB.xlsx"):
@@ -52,6 +56,32 @@ def savesuko(_row, table, prize):
     ws.cell(_row, c_sdk_prize, str(prize))
     wb.save("userDB.xlsx")
     wb.close()
+
+def savejanken(_row, _you, _bot, prize):
+    wb, ws = readxls()
+    #보드판 문자열 하나로 합치기
+    if _you != 0 and _bot != 0:
+        for i in range(3):
+            _you_str = ','.join(list(map(str,_you[i])))
+            _bot_str = ','.join(list(map(str,_bot[i])))
+    else:
+        _you_str = str(_you)
+        _bot_str = str(_bot)
+    ws.cell(_row, c_janken_you, _you_str)
+    ws.cell(_row, c_janken_mazin, _bot_str)
+    ws.cell(_row, c_janken_prise, str(prize))
+    wb.save("userDB.xlsx")
+    wb.close()
+    
+def readjanken(_row):
+    wb, ws = readxls()
+    _you_str = ws.cell(_row, c_janken_you).value
+    _bot_str = ws.cell(_row, c_janken_mazin).value
+    prize = ws.cell(_row, c_janken_prise).value
+    #문자열 보드판배열로 복구
+    _you = _you_str.split(',')
+    _bot = _bot_str.split(',')
+    return _you, _bot, prize
     
 def readsuko(_row):
     wb, ws = readxls()
@@ -136,6 +166,8 @@ def signup(_name, _id):
     ws.cell(_row, c_uke, str(0))
     ws.cell(_row, c_sudoku, str(0))
     ws.cell(_row, c_sdk_prize, str(0))
+    ws.cell(_row, c_janken_you, str(0))
+    ws.cell(_row, c_janken_mazin, str(0))
     wb.save("userDB.xlsx")
     wb.close()
 
@@ -193,6 +225,8 @@ def rstdat():
             ws.cell(row, c_uke, str(0))
             ws.cell(row, c_sudoku, str(0))
             ws.cell(row, c_sdk_prize, str(0))
+            ws.cell(row, c_janken_you, str(0))
+            ws.cell(row, c_janken_mazin, str(0))
         else:
             break
     ws.cell(1, 2, str(csno()))
