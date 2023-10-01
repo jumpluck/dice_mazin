@@ -981,5 +981,5 @@ async def baccarat(ctx, batrslt, batting):
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
-
+# keep_alive()
 bot.run(token)
