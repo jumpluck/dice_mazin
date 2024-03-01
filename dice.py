@@ -63,7 +63,7 @@ def vsbt(lvl, botlvl):
 
 def setdeck():
     arr = [0 for i in range(3)]
-    for i in range(5):
+    for i in range(6):
         arr[randrange(3)] += 1
     return arr
 

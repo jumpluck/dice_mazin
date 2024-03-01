@@ -10,6 +10,7 @@ from discord.ext import commands
 from math import ceil
 from sudoku import sudoku_ans_set, sudoku_prt_str, make_problem, chk_sudoku, sudoku_create
 import os
+# from keep_alive import keep_alive
 
 def dtsv_bot():
     datasave()
@@ -115,6 +116,62 @@ async def dice_roll(ctx, dice):
     else:
         await ctx.send("個数D面数でお願いします")
 
+@bot.command(aliases=['cc' or 'CC'])
+async def coc_dice(ctx, kijun, option='0'):
+    try:
+        kijun = int(kijun)
+        option = int(option)
+    except:
+        await ctx.send("なんかおかしい！")
+    if kijun >= 0 and kijun <= 100:
+        dice_tmp = roll(1, 100)
+        dice_tmp = dice_tmp[0]
+        dice_one = dice_tmp % 10
+        dice_ten = [dice_tmp // 10]
+        if abs(option)-1 > 0:
+            for i in range(abs(option)-1):
+                dice_tmp = roll(1, 10)
+                dice_tmp = dice_tmp[0] - 1
+                if dice_tmp == 0 and dice_one == 0:
+                    dice_ten.append(10)
+                else:
+                    dice_ten.append(dice_tmp)
+        dice_results = []
+        for dt in dice_ten:
+            dice_results.append(dt * 10 + dice_one)
+        if option > 0:
+            opt = 'ボーナスダイス ' + str(option) + '個'
+            dice_result = min(dice_results)
+        else:
+            opt = 'ペナルティダイス ' + str(abs(option)) + '個'
+            dice_result = max(dice_results)
+        if dice_result == 1:
+            hantei = 'クリティカル'
+        elif (kijun >= 50 and dice_result == 100) or (kijun < 50 and dice_result >= 95):
+            hantei = 'ファンブル'
+        elif dice_result <= kijun // 5:
+            hantei = 'イクストリーム成功'
+        elif dice_result <= kijun // 2:
+            hantei = 'ハード成功'
+        elif dice_result <= kijun:
+            hantei = 'レギュラー成功'
+        else:
+            hantei = '失敗'
+        dices = ''
+        for i in range(len(dice_results)):
+            if i > 0:
+                dices += ', '
+            dices += str(dice_results[i])
+        if option == 0:
+            await ctx.send(
+                f"{ctx.author.mention}の技能値({str(kijun)})ロール結果 > {str(dice_result)} > {hantei}"
+            )
+        else:
+            await ctx.send(
+                f"{ctx.author.mention}の技能値({str(kijun)})ロール結果({opt}) > ({dices}) > {str(dice_result)} > {hantei}"
+            )
+    else:
+        await ctx.send("技能値は0~100までにしてください")
     
 @bot.command(aliases=['w', '書く'])
 async def sudoku_set(ctx, cord, ans):
@@ -529,101 +586,152 @@ async def mazininfo(ctx):
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
 
 
-@bot.command(aliases=['v', 'bot戦'])
+@bot.command(aliases=['vv', 'bot戦'])
 async def vsbot(ctx, bat = -99):
     row = findid(ctx.author.id)
     if row is not None:
         money, level, cnt, ccnt = rdinf(row)
-        you_jan, maz_jan, prise_jan = readjanken(row)
-        if int(cnt) > 0:
-            if you_jan == '0':
-                if int(bat) <= 0:
-                    await ctx.send("少なくとも1円以上は掛けないと...")
+        you_jan, maz_jan, prise_jan, you_win, maz_win = readjanken(row)
+        if you_jan == '0':
+            bat = int(bat)
+            if bat < 1000:
+                await ctx.send("少なくとも1000円以上は掛けないと...")
+            else:
+                mamny = mazinkin()
+                if money < bat:
+                    await ctx.send("所持金が{}円より少ないわよ！コラァ！！！".format(str(bat)))
+                elif mamny < bat:
+                    await ctx.send("魔人の所持金は{}円しかないです、いじめないでください。".format(str(mamny)))
                 else:
-                    mamny = mazinkin()
-                    if money < int(bat):
-                        await ctx.send("所持金が{}円より少ないわよ！コラァ！！！".format(bat))
-                    elif mamny < int(bat):
-                        await ctx.send("魔人の所持金は{}円しかないです、いじめないでください。".format(str(mamny)))
-                    else:
-                        
-                        if you_jan == '0':
-                            you_jan = setdeck()
-                            maz_jan = setdeck()
-                            prise_jan = bat
-                        
-                    '''
-                    # kigen = mazinki(row)
-                    # if kigen < 0:
-                    #     botlvl = calbotlvl()+(kigen//2)+1
-                    #     if botlvl < 0:
-                    #         botlvl = 0
-                    # else:
-                    #     botlvl = calbotlvl()+(kigen//2)
-                    # mamny = mazinkin()
-                    # # botlvl -= mamny // 10000
-                    # if botlvl < 0:
-                    #     botlvl = 0
-                    # macnted(row, cnt - 1)
-                    # rslt, dcpl, dcbt = vsbt(level, botlvl)
-                    # if rslt == 0 or rslt == 3:
-                    #     botbed = discord.Embed(title="VS 魔人戦", description="引き分け！", color=0xFFFFFF)
-                    # elif rslt == 1 or rslt == 4:
-                    #     edtmny(row, money+int(bat))
-                    #     mazinkined(mamny-int(bat))
-                    #     mazinkied(row, kigen+1)
-                    #     botbed = discord.Embed(title="VS 魔人戦", description="あなたの勝ち！", color=0xB9E3FC)
-                    # else:
-                    #     edtmny(row, money-int(bat))
-                    #     mazinkined(mamny+int(bat))
-                    #     mazinkied(row, kigen-1)
-                    #     botbed = discord.Embed(title="VS 魔人戦", description="あなたの負け！", color=0xFFE0F5)
-                    # if rslt == 3:
-                    #     if dcbt == 1:
-                    #         edtmny(row, money + ceil(int(bat)/2))
-                    #         mazinkined(mamny + ceil(int(bat)/2))
-                    #         botbed.add_field(name="双方勝利！", value="二人とも出目:{}".format(dcbt), inline=False)
-                    #     if dcbt == 100:
-                    #         edtmny(row, money - ceil(int(bat)/2))
-                    #         mazinkined(mamny - ceil(int(bat)/2))
-                    #         botbed.add_field(name="双方敗北！", value="二人とも出目:{}".format(dcbt), inline=False)
-                    # else:
-                    #     if dcbt == 1:
-                    #         botbed.add_field(name="ダイスの魔人", value="出目:{}\n確定勝利".format(dcbt))
-                    #     elif dcbt == 100:
-                    #         botbed.add_field(name="ダイスの魔人", value="出目:{}\n確定敗北".format(dcbt))
-                    #     else:
-                    #         botbed.add_field(name="ダイスの魔人", value="出目:{}＋ダイス効果:{}\n合計:{}"
-                    #                          .format(dcbt, botlvl**2, (botlvl**2)+dcbt))
-                    #     if dcpl == 1:
-                    #         botbed.add_field(name="あなた", value="出目:{}\n確定勝利".format(dcpl))
-                    #     elif dcpl == 100:
-                    #         botbed.add_field(name="あなた", value="出目:{}\n確定敗北".format(dcpl))
-                    #     else:
-                    #         botbed.add_field(name="あなた", value="出目:{}＋ダイス効果:{}\n合計:{}"
-                    #                          .format(dcpl, level**2, (level**2)+dcpl))
-                    # money2, level, cnt2, ccnt = rdinf(row)
-                    # mamny2 = mazinkin()
-                    # botbed.add_field(name="あなたの所持金", value="{}円 -> {}円".format(money, money2), inline=False)
-                    # botbed.add_field(name="魔人の所持金", value="{}円 -> {}円".format(mamny, mamny2), inline=False)
-                    # botbed.add_field(name="残りの魔人への挑戦回数", value="{}回 -> {}回".format(cnt, cnt2), inline=False)
-                    # if botlvl > calbotlvl():
-                    #     botbed.add_field(name="魔人はあなたに激おこぷんぷん丸です", value="魔人のダイスが＋{}されます"
-                    #                      .format(botlvl - calbotlvl()), inline=False)
-                    # elif botlvl < calbotlvl():
-                    #     botbed.add_field(name="魔人はあなたに仏様のような笑みを見せてます", value="魔人のダイスが-{}されます"
-                    #                      .format(calbotlvl() - botlvl), inline=False)
-                    # botbed.set_footer(text="魔人のダイス:＋{}(プレイヤーの強化平均値 + 魔人の機嫌補正)".format(botlvl))
-                    # await ctx.send(embed=botbed)
-                    '''
+                    you_jan = setdeck()
+                    maz_jan = setdeck()
+                    prise_jan = bat
+                    edtmny(row, money-bat)
+                    mazinkined(mamny-bat)
+                    await ctx.send(f"じゃんけん勝負スタート！\nプレイヤー：{ctx.author.mention}\n掛け金：{bat}円\nあなたの所持金：{str(money)}円 -> {str(money-bat)}円\n魔人の所持金：{str(mamny)}円 -> {str(mamny-bat)}円")
+                    savejanken(row, you_jan, maz_jan, prise_jan, 0, 0)
+                    jan_str = f"```\n{ctx.author.name}の手札\n✊：{str(you_jan[0])} ✌️：{str(you_jan[1])} 🖐️：{str(you_jan[2])}\n```"
+                    await ctx.send(jan_str)
+                    jan_str = f"```\n魔人の手札\n✊：{str(maz_jan[0])} ✌️：{str(maz_jan[1])} 🖐️：{str(maz_jan[2])}\n```"
+                    await ctx.send(jan_str)
+                    await ctx.send(f"```\n$v ✊：1 ✌️：2 🖐️：3 でプレイしてください\n```")
                 sched.resume()
-                
-            
-                
         else:
-            await ctx.send("魔人いじめはもうやめて強化しに行こう？")
+            await ctx.send(f"プレイヤー：{ctx.author.mention}\n掛け金：{str(prise_jan)}円")
+            jan_str = f"```\n{ctx.author.name}の手札\n✊：{str(you_jan[0])} ✌️：{str(you_jan[1])} 🖐️：{str(you_jan[2])}\n```"
+            await ctx.send(jan_str)
+            jan_str = f"```\n魔人の手札\n✊：{str(maz_jan[0])} ✌️：{str(maz_jan[1])} 🖐️：{str(maz_jan[2])}\n```"
+            await ctx.send(jan_str)
+            await ctx.send(f"```\n$v ✊：1 ✌️：2 🖐️：3 でプレイしてください\n```")
     else:
         await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
+
+
+@bot.command(aliases=['v', 'じゃんけん'])
+async def janken(ctx, play = -1):
+    row = findid(ctx.author.id)
+    if row is not None:
+        you_jan, maz_jan, prise_jan, you_win, maz_win = readjanken(row)
+        if you_jan != '0':
+            play = int(play) - 1
+            if play >= 0 and play <= 2:
+                if you_jan[play] > 0:
+                    ref = ['✊','✌️','🖐️']
+                    m_play = calwin(you_jan, maz_jan)
+                    kigen = mazinki(row)
+                    money, level, cnt, ccnt = rdinf(row)
+                    await ctx.send(f"{ctx.author.name}は{ref[play]}を出した！\n魔人は{ref[m_play]}を出した！")
+                    if (m_play+1)%3 == play:
+                        await ctx.send(f"```\n魔人の勝ち！\n{ctx.author.name}のスコア：{str(you_win)}\n魔人のスコア：{str(maz_win)} -> {str(maz_win+1)}\n```")
+                        maz_win += 1
+                    elif (play+1)%3 == m_play:
+                        await ctx.send(f"```\n{ctx.author.name}の勝ち！\n{ctx.author.name}のスコア：{str(you_win)} -> {str(you_win+1)}\n魔人のスコア：{str(maz_win)}\n```")
+                        you_win += 1
+                    else:
+                        await ctx.send(f"引き分けなのでダイス勝負！")
+                        botlvl = calbotlvl()+kigen
+                        rslt, dcpl, dcbt = vsbt(level, botlvl)
+                        if rslt == 0 or rslt == 3:
+                            botbed = discord.Embed(title="ダイス勝負", description="引き分け！", color=0xFFFFFF)
+                            maz_win += 1
+                            you_win += 1
+                            win_str = f"```\n引き分けなので両者勝利\n{ctx.author.name}のスコア：{you_win-1} -> {you_win}\n魔人のスコア：{maz_win-1} -> {maz_win}\n```"
+                        elif rslt == 1 or rslt == 4:
+                            botbed = discord.Embed(title="ダイス勝負", description="あなたの勝ち！", color=0xB9E3FC)
+                            you_win += 1
+                            win_str = f"```\n{ctx.author.name}のスコア：{you_win-1} -> {you_win}\n魔人のスコア：{maz_win}\n```"
+                        else:
+                            botbed = discord.Embed(title="ダイス勝負", description="あなたの負け！", color=0xFFE0F5)
+                            maz_win += 1
+                            win_str = f"```\n{ctx.author.name}のスコア：{you_win}\n魔人のスコア：{maz_win-1} -> {maz_win}\n```"
+                        if rslt == 3:
+                            if dcbt == 1:
+                                botbed.add_field(name="双方勝利！", value="二人とも出目:{}".format(dcbt), inline=False)
+                            if dcbt == 100:
+                                botbed.add_field(name="双方敗北！", value="二人とも出目:{}".format(dcbt), inline=False)
+                        else:
+                            if dcbt == 1:
+                                botbed.add_field(name="ダイスの魔人", value="出目:{}\n確定勝利".format(dcbt))
+                            elif dcbt == 100:
+                                botbed.add_field(name="ダイスの魔人", value="出目:{}\n確定敗北".format(dcbt))
+                            else:
+                                botbed.add_field(name="ダイスの魔人", value="出目:{}＋ダイス効果:{}\n合計:{}"
+                                                .format(dcbt, botlvl, botlvl+dcbt))
+                            if dcpl == 1:
+                                botbed.add_field(name="あなた", value="出目:{}\n確定勝利".format(dcpl))
+                            elif dcpl == 100:
+                                botbed.add_field(name="あなた", value="出目:{}\n確定敗北".format(dcpl))
+                            else:
+                                botbed.add_field(name="あなた", value="出目:{}＋ダイス効果:{}\n合計:{}"
+                                                .format(dcpl, level, level+dcpl))
+                        if kigen > 0:
+                            botbed.add_field(name="魔人はあなたに激おこぷんぷん丸です", value="魔人のダイスが＋{}されます"
+                                            .format(kigen), inline=False)
+                        elif kigen < 0:
+                            botbed.add_field(name="魔人はあなたに仏様のような笑みを見せてます", value="魔人のダイスが-{}されます"
+                                            .format(abs(kigen)), inline=False)
+                        # botbed.set_footer(text="魔人のダイス:＋{}(プレイヤーの強化平均値 + 魔人の機嫌補正)".format(botlvl))
+                        await ctx.send(embed=botbed)
+                        await ctx.send(win_str)
+                    you_jan[play] -= 1
+                    maz_jan[m_play] -= 1
+                    
+                    if you_win == 3 and maz_jan == 3:
+                        edtmny(row, money+prise_jan)
+                        mamny = mazinkin()
+                        mazinkined(mamny+prise_jan)
+                        await ctx.send(f"```\nじゃんけん勝負結果：引き分け\n{ctx.author.name}の所持金：{money}円 -> {money+prise_jan}円\n魔人の所持金：{mamny}円 -> {mamny+prise_jan}円\n```")
+                        savejanken(row, 0, 0, 0, 0, 0)
+                    elif you_win == 3:
+                        edtmny(row, money+(prise_jan*2))
+                        mazinkied(row, kigen+1)
+                        await ctx.send(f"```\nじゃんけん勝負結果：{ctx.author.name}の勝利\n{ctx.author.name}の所持金：{money}円 -> {money+(prise_jan*2)}円\n```")
+                        savejanken(row, 0, 0, 0, 0, 0)
+                    elif maz_win == 3:
+                        mamny = mazinkin()
+                        mazinkined(mamny+(prise_jan*2))
+                        mazinkied(row, kigen-1)
+                        await ctx.send(f"```\nじゃんけん勝負結果：魔人の勝利\n魔人の所持金：{mamny}円 -> {mamny+(prise_jan*2)}円\n```")
+                        savejanken(row, 0, 0, 0, 0, 0)
+                    else:
+                        jan_str = f"```\n{ctx.author.name}の手札\n✊：{str(you_jan[0])} ✌️：{str(you_jan[1])} 🖐️：{str(you_jan[2])}\n```"
+                        await ctx.send(jan_str)
+                        jan_str = f"```\n魔人の手札\n✊：{str(maz_jan[0])} ✌️：{str(maz_jan[1])} 🖐️：{str(maz_jan[2])}\n```"
+                        await ctx.send(jan_str)
+                        savejanken(row, you_jan, maz_jan, prise_jan, you_win, maz_win)
+                    sched.resume()
+                else:
+                    await ctx.send("その手札は残ってません")
+                    jan_str = f"```\n{ctx.author.name}の手札\n✊：{str(you_jan[0])} ✌️：{str(you_jan[1])} 🖐️：{str(you_jan[2])}\n```"
+                    await ctx.send(jan_str)
+                    jan_str = f"```\n魔人の手札\n✊：{str(maz_jan[0])} ✌️：{str(maz_jan[1])} 🖐️：{str(maz_jan[2])}\n```"
+                    await ctx.send(jan_str)
+            else:
+                await ctx.send("✊:1 ✌️:2 🖐️:3 この中で選んでください")
+        else:
+            await ctx.send("じゃんけん勝負していません！\n$vvで勝負を始めてくださいな")
+    else:
+        await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))    
 
 
 @bot.command(aliases=['d', 'ダイス当て'])
@@ -781,7 +889,7 @@ async def battle(ctx, dice):
             money, level, cnt, ccnt = rdinf(row)
             dc = batdice(int(dice))
             await ctx.send("使用ダイス:{}面ダイス\n{}の出目:{}＋ダイスの効果:{}\n合計:{}"
-                           .format(dice, ctx.author.mention, dc, level**2, dc+(level**2)))
+                           .format(dice, ctx.author.mention, dc, level, dc+level))
             sched.resume()
         else:
             await ctx.send("{}はダイスの住民ではありません".format(ctx.author.mention))
@@ -878,19 +986,19 @@ async def uketetatsu(ctx, dicemen, money):
             elif s_dice == int(dicemen):
                 batbed.add_field(name=f"{s_name}", value=f"出目:{s_dice}\n確定敗北")
             else:
-                batbed.add_field(name=f"{s_name}", value=f"出目:{s_dice}＋ダイス効果:{s_level ** 2}\n合計:"
-                                                         f"{s_dice + (s_level ** 2)}")
+                batbed.add_field(name=f"{s_name}", value=f"出目:{s_dice}＋ダイス効果:{s_level}\n合計:"
+                                                         f"{s_dice + (s_level)}")
             if u_dice == 1:
                 batbed.add_field(name=f"{u_name}", value="出目:1\n確定勝利")
             elif u_dice == int(dicemen):
                 batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}\n確定敗北")
             else:
-                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}＋ダイス効果:{u_level ** 2}\n"
-                                                         f"合計:{u_dice + (u_level ** 2)}")
-            if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or ((s_dice + (s_level ** 2)) ==
-                                                                                 (u_dice + (u_level ** 2))):
+                batbed.add_field(name=f"{u_name}", value=f"出目:{u_dice}＋ダイス効果:{u_level}\n"
+                                                         f"合計:{u_dice + (u_level)}")
+            if (u_dice == s_dice == 1) or (u_dice == s_dice == int(dicemen)) or ((s_dice + (s_level)) ==
+                                                                                 (u_dice + (u_level))):
                 batbed.add_field(name="対戦結果", value="引き分け", inline=False)
-            elif (s_dice == 1) or (u_dice == int(dicemen)) or (u_dice + (u_level ** 2)) < (s_dice + (s_level ** 2)):
+            elif (s_dice == 1) or (u_dice == int(dicemen)) or (u_dice + (u_level)) < (s_dice + (s_level)):
                 batbed.add_field(name="対戦結果", value=f"{s_name}の勝ち", inline=False)
                 edtmny(row, u_money - batmny)
                 edtmny(uke, s_money + batmny)

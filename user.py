@@ -20,7 +20,8 @@ c_sdk_prize = 11
 c_janken_you = 12
 c_janken_mazin = 13
 c_janken_prise = 14
-data_range = 'A1:K50'
+c_janken_win = 15
+data_range = 'A1:Z50'
 default_money = 10000
 default_lvl = 0
 default_cnt = 3
@@ -57,31 +58,39 @@ def savesuko(_row, table, prize):
     wb.save("userDB.xlsx")
     wb.close()
 
-def savejanken(_row, _you, _bot, prize):
+def savejanken(_row, _you, _bot, prize, you_win, bot_win):
     wb, ws = readxls()
     #보드판 문자열 하나로 합치기
     if _you != 0 and _bot != 0:
-        for i in range(3):
-            _you_str = ','.join(list(map(str,_you[i])))
-            _bot_str = ','.join(list(map(str,_bot[i])))
+        _you_str = '/'.join(list(map(str,_you)))
+        _bot_str = '/'.join(list(map(str,_bot)))
     else:
         _you_str = str(_you)
         _bot_str = str(_bot)
+    _win = str(you_win) + '/' + str(bot_win)
     ws.cell(_row, c_janken_you, _you_str)
     ws.cell(_row, c_janken_mazin, _bot_str)
     ws.cell(_row, c_janken_prise, str(prize))
+    ws.cell(_row, c_janken_win, _win)
     wb.save("userDB.xlsx")
     wb.close()
     
 def readjanken(_row):
     wb, ws = readxls()
-    _you_str = ws.cell(_row, c_janken_you).value
-    _bot_str = ws.cell(_row, c_janken_mazin).value
+    _you = ws.cell(_row, c_janken_you).value
+    _bot = ws.cell(_row, c_janken_mazin).value
     prize = ws.cell(_row, c_janken_prise).value
+    win = ws.cell(_row, c_janken_win).value
     #문자열 보드판배열로 복구
-    _you = _you_str.split(',')
-    _bot = _bot_str.split(',')
-    return _you, _bot, prize
+    if _you != '0':
+        _you = list(map(int, _you.split('/')))
+    if _bot != '0':
+        _bot = list(map(int, _bot.split('/')))
+    if win != '0':
+        win = list(map(int, win.split('/'))) # 0:플레이어, 1:마인 승수
+    else:
+        win = [0, 0]
+    return _you, _bot, int(prize), win[0], win[1]
     
 def readsuko(_row):
     wb, ws = readxls()
@@ -168,6 +177,8 @@ def signup(_name, _id):
     ws.cell(_row, c_sdk_prize, str(0))
     ws.cell(_row, c_janken_you, str(0))
     ws.cell(_row, c_janken_mazin, str(0))
+    ws.cell(_row, c_janken_prise, str(0))
+    ws.cell(_row, c_janken_win, str(0))
     wb.save("userDB.xlsx")
     wb.close()
 
@@ -227,6 +238,8 @@ def rstdat():
             ws.cell(row, c_sdk_prize, str(0))
             ws.cell(row, c_janken_you, str(0))
             ws.cell(row, c_janken_mazin, str(0))
+            ws.cell(row, c_janken_prise, str(0))
+            ws.cell(row, c_janken_win, str(0))
         else:
             break
     ws.cell(1, 2, str(csno()))
