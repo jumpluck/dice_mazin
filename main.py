@@ -10,14 +10,18 @@ from discord.ext import commands
 from math import ceil
 from sudoku import sudoku_ans_set, sudoku_prt_str, make_problem, chk_sudoku, sudoku_create
 import os
+import json
 # from keep_alive import keep_alive
 
 def dtsv_bot():
     datasave()
     sched.pause()
-
+    
+with open ("config.json","r") as cof:
+    data = json.load(cof)
+token = data['TOKEN']
 # token = os.environ['token']
-token = open("token.txt", "r").readline()
+# token = open("token.txt", "r").readline()
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix="$", intents=intents)  # 접두사를 $로 지정
 sched = BackgroundScheduler()
